@@ -10,6 +10,8 @@ import {
   Camera,
   Mic,
   MicOff,
+  Store,
+  Hand,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -147,7 +149,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         {showQuickActions && !input && !isKeyboardOpen && (
           <div className="grid grid-cols-2 gap-2 mb-1 max-h-[120px] overflow-y-auto">
             <button
-              onClick={() => handleQuickAction("Show me lunch combos")}
+              onClick={() => handleQuickAction("Show me Best Kurta available")}
               className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
               style={{
                 backgroundColor: theme.inputButtonBg,
@@ -155,12 +157,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               }}
               type="button"
             >
-              <Timer className="w-3.5 h-3.5" />
-              <span>Lunch combos ?</span>
+              <Store className="w-3.5 h-3.5" />
+              <span>Best Kurta available ?</span>
             </button>
 
             <button
-              onClick={() => handleQuickAction("Show me best veg options")}
+              onClick={() => handleQuickAction("Show me white sandals")}
               className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
               style={{
                 backgroundColor: theme.inputButtonBg,
@@ -168,12 +170,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               }}
               type="button"
             >
-              <Leaf className="w-3.5 h-3.5" />
-              <span>Best veg options ?</span>
+              <Store className="w-3.5 h-3.5" />
+              <span>White sandals ?</span>
             </button>
 
             <button
-              onClick={() => handleQuickAction("What are best chicken meals?")}
+              onClick={() =>
+                handleQuickAction("What are best Party wear tops?")
+              }
               className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
               style={{
                 backgroundColor: theme.inputButtonBg,
@@ -181,12 +185,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               }}
               type="button"
             >
-              <Pizza className="w-3.5 h-3.5" />
-              <span>Best chicken meals?</span>
+              <Store className="w-3.5 h-3.5" />
+              <span>Party wear tops?</span>
             </button>
 
             <button
-              onClick={() => handleQuickAction("Show me Spicy pizza")}
+              onClick={() => handleQuickAction("Show me Handcrafted suit?")}
               className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
               style={{
                 backgroundColor: theme.inputButtonBg,
@@ -194,8 +198,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               }}
               type="button"
             >
-              <Zap className="w-3.5 h-3.5" />
-              <span>Spicy pizza ?</span>
+              <Hand className="w-3.5 h-3.5" />
+              <span>Handcrafted suit ?</span>
             </button>
           </div>
         )}
@@ -232,7 +236,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           <button
             type="button"
             onClick={onSpeechToggle}
-            aria-label={isSpeechEnabled ? "Stop voice input" : "Start voice input"}
+            aria-label={
+              isSpeechEnabled ? "Stop voice input" : "Start voice input"
+            }
             aria-pressed={isSpeechEnabled}
             className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
           >
@@ -272,9 +278,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                   }}
                   type="button"
                 >
-                  <div
-                    className="flex items-center justify-center w-8 h-8 rounded-full"
-                  >
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full">
                     <ImageIcon className="w-4 h-4" />
                   </div>
                   <span>Upload image</span>
@@ -293,9 +297,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                   }}
                   type="button"
                 >
-                  <div
-                    className="flex items-center justify-center w-8 h-8 rounded-full"
-                  >
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full">
                     <Camera className="w-4 h-4" />
                   </div>
                   <span>Take photo</span>
