@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.2s ease-out;
+}
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.2s ease-out;
+}
+
+/* Success Animation Keyframes */
+@keyframes success-bounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(0.95);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.05);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(180deg);
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(400px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Generate multiple float animations */
+.animate-float-1 {
+  animation: float 3s ease-in-out infinite 0.1s;
+}
+.animate-float-2 {
+  animation: float 3.5s ease-in-out infinite 0.2s;
+}
+.animate-float-3 {
+  animation: float 4s ease-in-out infinite 0.3s;
+}
+.animate-float-4 {
+  animation: float 4.5s ease-in-out infinite 0.4s;
+}
+.animate-float-5 {
+  animation: float 5s ease-in-out infinite 0.5s;
+}
+
+/* Generate multiple confetti animations */
+.animate-confetti-1 {
+  animation: confetti-fall 2s linear infinite 0.1s;
+}
+.animate-confetti-2 {
+  animation: confetti-fall 2.2s linear infinite 0.2s;
+}
+.animate-confetti-3 {
+  animation: confetti-fall 2.4s linear infinite 0.3s;
+}
+.animate-confetti-4 {
+  animation: confetti-fall 2.6s linear infinite 0.4s;
+}
+.animate-confetti-5 {
+  animation: confetti-fall 2.8s linear infinite 0.5s;
+}
+
+.animate-success-bounce {
+  animation: success-bounce 1.5s cubic-bezier(0.28, 0.84, 0.42, 1) infinite;
+}
+
+/* Success fade in animation */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease-out forwards;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 3s ease infinite;
+}
+
+/* Fix for mobile viewport height */
+@supports (-webkit-touch-callout: none) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+
+  html {
+    height: -webkit-fill-available;
+  }
+}
+
+/* Prevent elastic scroll on iOS */
+.overscroll-contain {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
