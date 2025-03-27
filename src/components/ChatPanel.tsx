@@ -250,14 +250,16 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   const categories = useMemo(() => {
     if (allMenuItems.length === 0) return [];
     return Array.from(
-      new Set(allMenuItems.map((item) => item.category).filter(Boolean))
+      new Set(allMenuItems.map((item) => item.product_type).filter(Boolean))
     ).sort();
   }, [allMenuItems, selectedCategory]);
 
   // Filter menu items by category
   const filteredMenuItems = useMemo(() => {
     if (selectedCategory) {
-      return allMenuItems.filter((item) => item.category === selectedCategory);
+      return allMenuItems.filter(
+        (item) => item.product_type === selectedCategory
+      );
     } else {
       return allMenuItems;
     }
@@ -541,14 +543,14 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
                     <MenuItem
                       key={item.id}
                       id={item.id}
-                      name={item.name}
-                      price={item.price}
+                      name={item.title}
+                      price={item.variants[0].price}
                       restaurant={
                         state.selectedRestaurant ? state.selectedRestaurant : ""
                       }
                       image={
-                        item.image && item.image != ""
-                          ? item.image
+                        item.image?.src && item.image.src != ""
+                          ? item.image.src
                           : "https://i.pinimg.com/originals/da/4f/c2/da4fc2360e1dcc5c85cf5eeaee4b107f.gif"
                       }
                       quantity={0}

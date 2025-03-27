@@ -13,7 +13,10 @@ import { QueryType, useChatContext } from "../context/ChatContext";
 import { useRestaurant } from "../context/RestaurantContext";
 import { useAuth } from "../context/AuthContext";
 import { useFiltersContext } from "../context/FiltersContext";
-import { SpeechService, SpeechRecognitionResult } from "../services/speechService";
+import {
+  SpeechService,
+  SpeechRecognitionResult,
+} from "../services/speechService";
 
 export const DunkinOrderApp: React.FC = () => {
   const { toast, hideToast } = useToast();
@@ -43,8 +46,8 @@ export const DunkinOrderApp: React.FC = () => {
 
   // Set initial restaurant if needed
   useEffect(() => {
-    const initialRestroId = 7246;
-    const initialRestroName = "Pizza Hut";
+    const initialRestroId = 1;
+    const initialRestroName = "Shopify Store";
     const backImageUrl =
       "https://nextgalleriamalls.com/nextmusarambagh/wp-content/uploads/2024/02/pizzahut.png";
 
@@ -193,9 +196,7 @@ export const DunkinOrderApp: React.FC = () => {
   }, [state.currentQueryType]);
 
   // ----- Speech Recognition handlers -----
-  const handleSpeechRecognition = async (
-    result: SpeechRecognitionResult
-  ) => {
+  const handleSpeechRecognition = async (result: SpeechRecognitionResult) => {
     if (!result.isFinal) {
       setInterimTranscript(result.transcript);
       return;
@@ -249,24 +250,21 @@ export const DunkinOrderApp: React.FC = () => {
       setInterimTranscript("");
     } else {
       setIsSpeechEnabled(true);
-      speechService.startListening(
-        handleSpeechRecognition,
-        (error: string) => {
-          console.error(error);
-          setIsSpeechEnabled(false);
-          setInterimTranscript("");
-          dispatch({
-            type: "ADD_MESSAGE",
-            payload: {
-              id: Date.now(),
-              text: "Sorry, there was an error with speech recognition. Please try again.",
-              isBot: true,
-              time: getCurrentTime(),
-              queryType: QueryType.GENERAL,
-            },
-          });
-        }
-      );
+      speechService.startListening(handleSpeechRecognition, (error: string) => {
+        console.error(error);
+        setIsSpeechEnabled(false);
+        setInterimTranscript("");
+        dispatch({
+          type: "ADD_MESSAGE",
+          payload: {
+            id: Date.now(),
+            text: "Sorry, there was an error with speech recognition. Please try again.",
+            isBot: true,
+            time: getCurrentTime(),
+            queryType: QueryType.GENERAL,
+          },
+        });
+      });
     }
   };
   // -----------------------------------------

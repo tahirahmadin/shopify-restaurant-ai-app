@@ -4,7 +4,7 @@ import { getMenuByRestaurantId } from "../../utils/menuUtils";
 import { filterRestaurantsByDistance } from "../../utils/distanceUtils";
 
 interface RecommendedItem {
-  id?: number; 
+  id?: number;
   name: string;
 }
 
@@ -14,7 +14,7 @@ interface Message {
   isBot: boolean;
   time: string;
   queryType?: QueryType;
-  recommendedItems?: RecommendedItem[]; 
+  recommendedItems?: RecommendedItem[];
 }
 
 interface ChatLogicProps {
@@ -33,7 +33,7 @@ interface ChatLogicProps {
 
 const MENU_CACHE_TTL = 2 * 60 * 1000;
 const LLM_CACHE_TTL = 1 * 60 * 1000;
-const RESTAURANT_QUERY_CACHE_TTL = 1 * 60 * 1000; 
+const RESTAURANT_QUERY_CACHE_TTL = 1 * 60 * 1000;
 
 interface CacheEntry<T> {
   value: T | null;
@@ -86,11 +86,11 @@ const getCachedLLMResponse = async (
       if (entry.promise) return await entry.promise;
     }
   }
-  
+
   const promise = generateLLMResponse(prompt, maxTokens, model, temperature);
   llmCache.set(key, { value: null, timestamp: now, promise });
   const response = await promise;
-  
+
   llmCache.set(key, { value: response, timestamp: Date.now() });
   return response;
 };
@@ -104,21 +104,28 @@ const isGreetingOnly = (query: string): boolean => {
     "good afternoon",
     "good evening",
     "whatsup",
-    "whats up"
+    "whats up",
   ];
-  const cleaned = query.toLowerCase().replace(/[^a-z\s]/g, "").trim();
+  const cleaned = query
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, "")
+    .trim();
   return greetings.includes(cleaned);
 };
 
-
-const buildConversationContext = (chatHistory: Message[], limit: number = 5): string => {
-  const recentMessages = chatHistory.filter(msg => !msg.isBot).slice(-limit);
+const buildConversationContext = (
+  chatHistory: Message[],
+  limit: number = 5
+): string => {
+  const recentMessages = chatHistory.filter((msg) => !msg.isBot).slice(-limit);
   return recentMessages.length > 0
     ? recentMessages
         .map((msg) => {
           let contextText = msg.text;
           if (msg.recommendedItems && msg.recommendedItems.length > 0) {
-            contextText += " | Recommended: " + msg.recommendedItems.map(item => item.name).join(", ");
+            contextText +=
+              " | Recommended: " +
+              msg.recommendedItems.map((item) => item.name).join(", ");
           }
           return contextText;
         })
@@ -133,7 +140,6 @@ const classifyIntent = async (
   chatHistory: Message[],
   isImageBased: boolean = false
 ): Promise<QueryType> => {
-
   if (isImageBased) return QueryType.MENU_QUERY;
 
   const restaurantKeywords = [
@@ -145,7 +151,7 @@ const classifyIntent = async (
     "closed",
     "timing",
     "hours",
-    "address"
+    "address",
   ];
   const menuKeywords = [
     "price",
@@ -159,7 +165,7 @@ const classifyIntent = async (
     "suggest",
     "what should",
     "what's good",
-    "something to eat"
+    "something to eat",
   ];
 
   const lowerQuery = query.toLowerCase();
@@ -172,34 +178,35 @@ const classifyIntent = async (
   if (isRestaurant) return QueryType.RESTAURANT_QUERY;
   if (isMenu) return QueryType.MENU_QUERY;
 
-  
   const conversationContext = buildConversationContext(chatHistory);
 
   const classificationPrompt = `
-      You are an intent classifier for a food ordering platform that aggregates recommendations from multiple restaurants. Your task is to classify a given user query into exactly one of three types: "MENU_QUERY", "RESTAURANT_QUERY", or "GENERAL".
+      You are an intent classifier for a ecommerce platform that recommends items from a shopify store. Your task is to classify a given user query into exactly one of two types: "MENU_QUERY", or "GENERAL".
       
       Definitions:
-      - "MENU_QUERY": Use this category when the query specifically requests a list of food items or dishes for ordering. Examples include: "What's on the menu?", "Show me available dishes", or "I want to order a burger". In this mode, the response will always recommend food items.
-      - "RESTAURANT_QUERY": Use this category when the query is about the restaurant or the ordering service. This includes questions about location, delivery, ordering process, or direct restaurant recommendations. Even if food is mentioned, if the focus is on the restaurant's details, use this category.
-      - "GENERAL": Use this category for queries that are conversational or ask for additional details about a food item (such as ingredients, taste, preparation, or nutritional information). Also include greetings or casual conversation here. Responses for GENERAL queries are typically brief (2-3 lines) and chatty.
+      - "MENU_QUERY": Use this category when the query specifically requests a list of items or products for ordering. Examples include: "Best microwave available?", "Show me available kurtas", or "I want a cheaper AC". In this mode, the response will always recommend shop products.
+      - "GENERAL": Use this category for queries that are conversational or ask for additional details about a product (such as tech info, warranty, prices, or vendor information). Also include greetings or casual conversation here. Responses for GENERAL queries are typically brief (2-3 lines) and chatty.
       
       Instructions:
       - Analyze the user query and any provided conversation context.
       - If the query asks for a list of dishes or ordering options, classify it as "MENU_QUERY".
-      - If the query asks about the restaurant, its operations, or service details, classify it as "RESTAURANT_QUERY".
-      - If the query asks for details about a food item (for example, "Tell me more about that dish", "What are its main ingredients?", or "Is it more creamy or tangy?") or is casual conversation, classify it as "GENERAL".
+      - If the query asks for details about a product (for example, "Tell me more about that product", "What are its chips?", or "Is it more durable or one time use?") or is casual conversation, classify it as "GENERAL".
       - Base your decision solely on the query and any provided conversation context.
       
       User Query: "${query}"
-      ${conversationContext ? `Conversation Context: "${conversationContext}"` : ""}
+      ${
+        conversationContext
+          ? `Conversation Context: "${conversationContext}"`
+          : ""
+      }
       
-      Respond with only a JSON object with one key "text" whose value is exactly one of the three strings: "MENU_QUERY", "RESTAURANT_QUERY", or "GENERAL".
+      Respond with only a JSON object with one key "text" whose value is exactly one of the three strings: "MENU_QUERY", or "GENERAL".
       
       STRICT FORMAT RULES:
       - Return only a valid JSON object in this exact format: { "text": "<intent>" }.
       - Do not include any extra text, explanations, markdown, or code fences.
       `;
-      
+
   const llmResult = await getCachedLLMResponse(
     classificationPrompt,
     50,
@@ -289,7 +296,11 @@ export const useChatLogic = ({
       }
     }
     const promise = (async () => {
-      const menu = await getMenuByRestaurantId(restaurantId, restaurantState, dispatch);
+      const menu = await getMenuByRestaurantId(
+        restaurantId,
+        restaurantState,
+        dispatch
+      );
       const filtered = filterMenuItems(menu);
       menuCache.set(restaurantId, { value: filtered, timestamp: Date.now() });
       return filtered;
@@ -332,14 +343,15 @@ export const useChatLogic = ({
         ? `analyze the image description: "${effectiveQuery}"`
         : `analyze the user's query: "${effectiveQuery}"`;
 
-    
     const conversationContext = buildConversationContext(
       chatHistory.filter((msg) => !msg.isBot)
     );
 
     const key =
       queryText !== undefined
-        ? `image-${effectiveQuery}-${filteredRestaurants.map((r: any) => r.id).join(",")}`
+        ? `image-${effectiveQuery}-${filteredRestaurants
+            .map((r: any) => r.id)
+            .join(",")}`
         : `${input}-${filteredRestaurants.map((r: any) => r.id).join(",")}`;
 
     const now = Date.now();
@@ -358,7 +370,11 @@ export const useChatLogic = ({
       You are a restaurant recommendation system.
       Given the following restaurants: ${JSON.stringify(restaurantContext)},
       ${analysisText} and also consider previous order choices from ${orderContextItem}
-      ${conversationContext ? `and also consider the previous conversation: "${conversationContext}"` : ""}
+      ${
+        conversationContext
+          ? `and also consider the previous conversation: "${conversationContext}"`
+          : ""
+      }
       and return exactly one JSON object:
         { "restroIds": [] }
       where:
@@ -383,10 +399,10 @@ export const useChatLogic = ({
   };
 
   const handleMenuQuery = async (
-    _queryType: QueryType, 
+    _queryType: QueryType,
     userInput: string,
     isImageBased: boolean = false,
-    imageCaption: string = "" 
+    imageCaption: string = ""
   ) => {
     try {
       const now = new Date().toLocaleString("en-US", {
@@ -394,11 +410,12 @@ export const useChatLogic = ({
         minute: "numeric",
         hour12: true,
       });
-  
-      const effectiveInput = isImageBased && imageCaption 
-        ? `Image shows: ${userInput}. User says: ${imageCaption}`
-        : userInput;
-  
+
+      const effectiveInput =
+        isImageBased && imageCaption
+          ? `Image shows: ${userInput}. User says: ${imageCaption}`
+          : userInput;
+
       const queryType = isImageBased
         ? QueryType.MENU_QUERY
         : await classifyIntent(
@@ -408,11 +425,11 @@ export const useChatLogic = ({
             chatHistory,
             isImageBased
           );
-      
+
       const conversationContext = buildConversationContext(
         chatHistory.filter((msg) => !msg.isBot)
       );
-  
+
       if (queryType === QueryType.GENERAL) {
         if (isGreetingOnly(effectiveInput)) {
           const friendlyResponseText = "Hello! How can I help you today?";
@@ -442,7 +459,9 @@ export const useChatLogic = ({
           { "text": "your answer" }
           
           where:
-          - "text" provides a brief and creative response to what the user said in ${selectedStyle.name} style.
+          - "text" provides a brief and creative response to what the user said in ${
+            selectedStyle.name
+          } style.
           - For food preferences, suggest restaurants or dishes that match their preferences
           - For nutritional inquiries, provide helpful general information
           - For greetings, welcome them to the food recommendation service
@@ -472,14 +491,14 @@ export const useChatLogic = ({
           return;
         }
       }
-  
+
       let restaurant1Menu: any[] = [],
         restaurant2Menu: any[] = [],
         activeMenu: any[] = [];
       let suggestRestroText = "";
       let suggestRestroIds: number[] = [];
       const { activeRestroId } = restaurantState;
-  
+
       if (!activeRestroId) {
         const response = await handleRestaurantQuery(
           isImageBased ? effectiveInput : undefined
@@ -522,17 +541,19 @@ export const useChatLogic = ({
       } else {
         activeMenu = await getMenuItemsByFile(activeRestroId);
       }
-  
+
+      console.log("activeMenu");
+      console.log(activeMenu);
       const analysisPart = isImageBased
-        ? imageCaption 
+        ? imageCaption
           ? `analyze the image description: "${userInput}" along with user's comment: "${imageCaption}"`
           : `analyze the image description: "${userInput}"`
         : `analyze the user's query: "${userInput}"`;
-  
+
       const menuPrompt = `
-        You are a menu recommendation system.
-        Given the menu items from ${
-          activeRestroId ? "a restaurant" : "two restaurants"
+        You are a item recommendation system.
+        Given the items from ${
+          activeRestroId ? "a shopify store" : "multiple shopify stores"
         }: ${
         activeRestroId
           ? JSON.stringify(activeMenu)
@@ -541,14 +562,20 @@ export const useChatLogic = ({
             JSON.stringify(restaurant2Menu)
       },
         ${analysisPart}
-        ${conversationContext ? `Also, consider the following conversation context: "${conversationContext}"` : ""}
+        ${
+          conversationContext
+            ? `Also, consider the following conversation context: "${conversationContext}"`
+            : ""
+        }
         and return a JSON response: ${
           activeRestroId
             ? `{ "text": "", "items1": [] }`
             : `{ "text": "", "items1": [], "items2": [] }`
         }
         where:
-          - "text" provides a concise and creative response and reasoning showing you understand the query in ${selectedStyle.name} style.
+          - "text" provides a concise and creative response and reasoning showing you understand the query in ${
+            selectedStyle.name
+          } style.
           - ${
             activeRestroId
               ? `"items1" is array contains id of up to 5 recommended items.`
@@ -567,13 +594,13 @@ export const useChatLogic = ({
         state.selectedModel,
         0.5
       );
-  
+
       if ((suggestRestroIds.length > 0 || activeRestroId) && menuResponse) {
         dispatch({
           type: "ADD_MESSAGE",
           payload: {
             id: Date.now() + 1,
-            
+
             recommendedItems: menuResponse.items1 || [],
             text: menuResponse.text,
             llm: {
@@ -606,7 +633,7 @@ export const useChatLogic = ({
     getMenuItemsByFile,
     handleRestaurantQuery,
     handleMenuQuery,
-    determineQueryType, 
-    classifyIntent,   
+    determineQueryType,
+    classifyIntent,
   };
 };

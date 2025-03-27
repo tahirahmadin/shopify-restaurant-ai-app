@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import CryptoJS from "crypto-js";
 
 let apiUrl: string = import.meta.env.VITE_PUBLIC_BACKEND_API_URL;
+let accessToken: string = import.meta.env.VITE_PUBLIC_SHOPIFY_KEY;
 
 // LLM API function
 export const generateLLMResponse = async (
@@ -74,23 +75,44 @@ interface Restaurant {
 // Define menu types
 interface MenuItem {
   id: number;
-  name: string;
-  description: string;
-  category: string;
+  title: string;
+  body_html: string;
+  product_type: string;
   price: string;
-  restaurant: string;
-  image: string;
-  spicinessLevel: number;
-  sweetnessLevel: number;
-  dietaryPreference: string[];
-  healthinessScore: number;
-  popularity: number;
-  caffeineLevel: string;
-  sufficientFor: number;
+  vendor: string;
+  handle: string;
+  status: string;
+  published_scope: string;
+  tags: string;
+  variants: Array<{
+    id: number;
+    product_id: number;
+    title: string;
+    price: string;
+    position: number;
+  }>;
+  images: Array<{
+    id: number;
+    alt: string;
+    position: number;
+    product_id: number;
+    src: string;
+    width: number;
+    height: number;
+  }>;
+  options: Array<{
+    id: number;
+    product_id: number;
+    name: string;
+    position: number;
+  }>;
+  created_at: string;
+  updated_at: string;
+  published_at: string;
 }
 
 interface MenuResponse {
-  [key: string]: MenuItem[];
+  products: MenuItem[];
 }
 
 // Encryption function
@@ -170,13 +192,11 @@ export const getRestaurantMenu = async (
 ): Promise<MenuItem[]> => {
   try {
     const response = await axios.get(
-      `${apiUrl}/restaurant/getMultipleRestaurantMenu/${restaurantId}`
+      `https://aggregator.gobbl.ai/api/shopify/getProducts?accessToken=${accessToken}`
     );
 
-    if (response.data && !response.data.error) {
-      // Extract menu items from the response
-      const menuData = response.data.result as MenuResponse;
-      return menuData[restaurantId.toString()] || [];
+    if (response.data && response.data.result) {
+      return response.data.result;
     }
     return [];
   } catch (error) {

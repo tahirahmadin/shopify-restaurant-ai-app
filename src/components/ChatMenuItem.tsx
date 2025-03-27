@@ -113,7 +113,14 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
     // Add item to cart
     dispatch({
       type: "ADD_TO_CART",
-      payload: { id, name, price, quantity: 1, restaurant: restaurantName },
+      payload: {
+        id,
+        name,
+        price,
+        quantity: 1,
+        restaurant: restaurantName,
+        image: image,
+      },
     });
     handleSelectRestro(restroId);
   };
@@ -123,7 +130,14 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
     dispatch({ type: "SET_SELECTED_RESTAURANT", payload: restaurantName });
     dispatch({
       type: "ADD_TO_CART",
-      payload: { id, name, price, quantity: 1, restaurant: restaurantName },
+      payload: {
+        id,
+        name,
+        price,
+        quantity: 1,
+        restaurant: restaurantName,
+        image: image,
+      },
     });
     handleSelectRestro(restroId);
     setIsCartChangeModalOpen(false);

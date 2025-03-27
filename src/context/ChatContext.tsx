@@ -91,6 +91,7 @@ export interface CartItem {
   price: string;
   quantity: number;
   restaurant: string;
+  image: string;
   customizations?: {
     categoryName: string;
     selection: {

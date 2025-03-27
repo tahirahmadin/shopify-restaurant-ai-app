@@ -47,7 +47,8 @@ export const CartSummary: React.FC = () => {
     itemId: number,
     name: string,
     price: string,
-    change: number
+    change: number,
+    image: string
   ) => {
     const item = state.cart.find((i) => i.id === itemId);
     if (item) {
@@ -57,7 +58,7 @@ export const CartSummary: React.FC = () => {
       } else {
         dispatch({
           type: "UPDATE_CART_ITEM",
-          payload: { id: itemId, name, price, quantity: newQuantity },
+          payload: { id: itemId, name, price, quantity: newQuantity, image },
         });
       }
     }
@@ -180,9 +181,7 @@ export const CartSummary: React.FC = () => {
                     className="flex items-center gap-3 px-3 py-2 border-b"
                   >
                     <img
-                      src={`${import.meta.env.VITE_PUBLIC_AWS_BUCKET_URL}/${
-                        restaurantState.activeRestroId
-                      }/${restaurantState.activeRestroId}-${item.id}.jpg`}
+                      src={item.image}
                       alt={item.name}
                       className="w-12 h-12 object-cover rounded-lg"
                     />
@@ -249,7 +248,13 @@ export const CartSummary: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() =>
-                          updateQuantity(item.id, item.name, item.price, -1)
+                          updateQuantity(
+                            item.id,
+                            item.name,
+                            item.price,
+                            -1,
+                            item.image
+                          )
                         }
                         className={`p-1  rounded-full`}
                         style={{
@@ -270,7 +275,13 @@ export const CartSummary: React.FC = () => {
                       </span>
                       <button
                         onClick={() =>
-                          updateQuantity(item.id, item.name, item.price, 1)
+                          updateQuantity(
+                            item.id,
+                            item.name,
+                            item.price,
+                            1,
+                            item.image
+                          )
                         }
                         className="p-1 hover:bg-gray-100 rounded-full"
                       >

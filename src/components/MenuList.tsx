@@ -12,7 +12,8 @@ interface MenuListProps {
 
 export const MenuList: React.FC<MenuListProps> = ({ items, restroId }) => {
   const { state } = useChatContext();
-  const { state: restaurantState, dispatch: restaurantDispatch } = useRestaurant();
+  const { state: restaurantState, dispatch: restaurantDispatch } =
+    useRestaurant();
   const [menuItems, setMenuItems] = React.useState<any[]>([]);
 
   React.useEffect(() => {
@@ -33,6 +34,8 @@ export const MenuList: React.FC<MenuListProps> = ({ items, restroId }) => {
 
   const filteredMenuItems = useMemo(() => {
     const idSet = new Set<number>(items);
+    console.log(menuItems);
+    console.log(idSet);
     return menuItems.filter((menuItem) => idSet.has(menuItem.id));
   }, [items, menuItems]);
 
@@ -46,11 +49,11 @@ export const MenuList: React.FC<MenuListProps> = ({ items, restroId }) => {
             <ChatMenuItem
               key={meal.id}
               id={meal.id}
-              name={meal.name}
-              price={meal.price}
+              name={meal.title}
+              price={meal.variants[0].price}
               image={
-                meal.image && meal.image != ""
-                  ? meal.image
+                meal.image.src && meal.image.src != ""
+                  ? meal.image.src
                   : "https://i.pinimg.com/originals/da/4f/c2/da4fc2360e1dcc5c85cf5eeaee4b107f.gif"
               }
               restroId={restroId}
