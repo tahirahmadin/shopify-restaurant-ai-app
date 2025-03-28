@@ -482,10 +482,10 @@ Recommendation Logic:
     const menuContext = extractedResults
       .map((result) => {
         const text = (result.text || result.content || "").trim();
-        const priceMatches = text.match(/AED\s*\d+(\.\d{2})?/g) || [];
+        const priceMatches = text.match(/USD\s*\d+(\.\d{2})?/g) || [];
         const prices = priceMatches.map((p) => p.trim());
         const description = text
-          .replace(/AED\s*\d+(\.\d{2})?/g, "")
+          .replace(/USD\s*\d+(\.\d{2})?/g, "")
           .replace(/\s+/g, " ")
           .trim();
         return prices.length > 0 ? `${prices[0]} ${description}` : description;

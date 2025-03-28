@@ -29,7 +29,7 @@ export const CustomizationModal: React.FC = () => {
   useEffect(() => {
     if (item) {
       const defaults: Record<string, SelectedOption[]> = {};
-  
+
       if (item.customizations) {
         item.customizations.forEach((cust) => {
           const { categoryName, selection } = cust;
@@ -53,7 +53,7 @@ export const CustomizationModal: React.FC = () => {
         // Fallback: Use default values from full configuration
         item.customisation.categories.forEach((category) => {
           if (category.minQuantity > 0 && category.items.length > 0) {
-          // For required categories, select the minimum number of default options
+            // For required categories, select the minimum number of default options
             defaults[category.categoryName] = [
               {
                 name: category.items[0].name,
@@ -67,7 +67,6 @@ export const CustomizationModal: React.FC = () => {
       setSelectedOptions(defaults);
     }
   }, [item]);
-  
 
   const handleOptionSelect = (
     category: NonNullable<typeof item>["customisation"]["categories"][0],
@@ -211,7 +210,7 @@ export const CustomizationModal: React.FC = () => {
         },
       });
     }
-  
+
     handleClose();
   };
 
@@ -227,7 +226,7 @@ export const CustomizationModal: React.FC = () => {
               <h2 className="text-base font-semibold text-gray-800">
                 {item.name}
               </h2>
-              <p className="text-xs text-gray-500 mt-0.5">{item.price} AED</p>
+              <p className="text-xs text-gray-500 mt-0.5">{item.price} USD</p>
             </div>
             <button
               onClick={handleClose}
@@ -287,7 +286,7 @@ export const CustomizationModal: React.FC = () => {
                     </div>
                     {option.price > 0 && (
                       <span className="text-xs text-gray-500">
-                        +{option.price.toFixed(2)} AED
+                        +{option.price.toFixed(2)} USD
                       </span>
                     )}
                   </label>
@@ -322,7 +321,7 @@ export const CustomizationModal: React.FC = () => {
             <div>
               <p className="text-xs text-gray-500">Total</p>
               <p className="text-base font-bold text-primary">
-                {calculateTotal()} AED
+                {calculateTotal()} USD
               </p>
             </div>
           </div>

@@ -69,7 +69,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
                   <span className="opacity-90 text-xs">{item.name}</span>
                 </div>
                 <span className="opacity-80 text-xs">
-                  {(parseFloat(item.price) * item.quantity).toFixed(2)} AED
+                  {(parseFloat(item.price) * item.quantity).toFixed(2)} USD
                 </span>
               </div>
             ))}
@@ -78,7 +78,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
           <div className="border-t pt-3 mt-3">
             <div className="flex justify-between items-center">
               <span className="font-medium ">Total Amount</span>
-              <span className="font-bold ">{total} AED</span>
+              <span className="font-bold ">{total} USD</span>
             </div>
           </div>
 
@@ -170,7 +170,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
                       {item.quantity}x {item.name}
                     </span>
                     <span className="opacity-90 font-medium">
-                      {(parseFloat(item.price) * item.quantity).toFixed(2)} AED
+                      {(parseFloat(item.price) * item.quantity).toFixed(2)} USD
                     </span>
                   </div>
                 ))}
@@ -181,7 +181,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
                 <div className="flex justify-between items-center">
                   <span className="text-sm opacity-80">Total Amount</span>
                   <span className="text-lg font-bold ">
-                    {orderDetails.total} AED
+                    {orderDetails.total} USD
                   </span>
                 </div>
                 <div className="flex justify-between items-center mt-1">

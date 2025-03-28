@@ -194,7 +194,7 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
             className="font-bold text-[8px]"
             style={{ color: theme.menuItemPrice }}
           >
-            {price} AED
+            {price} USD
           </p>
         </div>
       </div>

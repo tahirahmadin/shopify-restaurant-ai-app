@@ -103,7 +103,7 @@ export const DishDetailsModal: React.FC<DishDetailsModalProps> = ({
           <div className="space-y-1">
             <div className="flex flex-col">
               <h3 className="text-sm font-medium text-gray-800">{name}</h3>
-              <p className="text-primary font-bold text-[12px]">{price} AED</p>
+              <p className="text-primary font-bold text-[12px]">{price} USD</p>
             </div>
             <div>
               <p className="text-xs text-gray-600">Description is missing.</p>

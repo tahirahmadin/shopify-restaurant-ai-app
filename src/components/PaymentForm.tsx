@@ -248,7 +248,7 @@ const CheckoutForm: React.FC<{
             .bscBaseDepositAddress;
       }
 
-      // Calculate USDT amount (assuming 1 AED = 0.27 USDT)
+      // Calculate USDT amount (assuming 1 USD = 0.27 USDT)
       const usdtAmount = parseFloat(total) * 0.27;
 
       // Transfer USDT
@@ -455,7 +455,7 @@ const CheckoutForm: React.FC<{
           <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 mb-6 shadow-inner">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-gray-500">Order Total</span>
-              <span className="font-bold text-gray-900">{total} AED</span>
+              <span className="font-bold text-gray-900">{total} USD</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-500">Delivery To</span>
@@ -522,7 +522,7 @@ const CheckoutForm: React.FC<{
         <div className="relative z-10 flex items-center justify-between mb-2">
           <div>
             <p className="text-[10px]">Order Total</p>
-            <p className="text-lg font-bold">{total} AED</p>
+            <p className="text-lg font-bold">{total} USD</p>
           </div>
 
           <p className="text-xs px-2 py-0.5 rounded-full">
@@ -709,7 +709,7 @@ const CheckoutForm: React.FC<{
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-gray-600">Amount to Pay</span>
               <span className="font-bold text-gray-900">
-                {parseFloat(total).toFixed(2)} AED
+                {parseFloat(total).toFixed(2)} USD
               </span>
             </div>
           </div>
@@ -747,7 +747,7 @@ const CheckoutForm: React.FC<{
             }}
           >
             <Wallet className="w-3.5 h-3.5" />
-            {isProcessing ? "Processing..." : `Pay ${total} AED & Place Order`}
+            {isProcessing ? "Processing..." : `Pay ${total} USD & Place Order`}
           </button>
         </form>
       )}

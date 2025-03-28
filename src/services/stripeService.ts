@@ -68,7 +68,7 @@ class StripeService {
 
       const lineItems = cart.map((item) => ({
         price_data: {
-          currency: "aed",
+          currency: "USD",
           product_data: {
             name: item.name,
           },
@@ -140,7 +140,7 @@ class StripeService {
 
       const lineItems = cart.map((item) => ({
         price_data: {
-          currency: "aed",
+          currency: "USD",
           product_data: {
             name: item.name,
           },
@@ -207,7 +207,7 @@ class StripeService {
 
       const lineItems = cart.map((item) => ({
         price_data: {
-          currency: "aed",
+          currency: "USD",
           product_data: {
             name: item.name,
           },
