@@ -446,11 +446,11 @@ export const useChatLogic = ({
           return;
         } else {
           const genericPrompt = `
-          You are Gobbl, a food recommendation bot. Your task is to handle general queries that don't directly relate to ordering food or restaurant information.
+          You are Gobbl, a item recommendation bot. Your task is to handle general queries that don't directly relate to ordering items or store information.
           
           These general queries include:
           * Greetings (e.g., "Hello", "Hi there")
-          * Nutritional inquiries (e.g., "How many calories in a burrito?", "What are the ingredients in your pizza?") - provide general information about food nutrition
+          * Product inquiries (e.g., "How many years of warranty it has?", "What are the technical info of this item?") - provide general information about product
           * General conversation (e.g., "Thank you", "How are you?")
           The user said: "${effectiveInput}"
           ${conversationContext ? `Context: "${conversationContext}"` : ""}
@@ -462,12 +462,9 @@ export const useChatLogic = ({
           - "text" provides a brief and creative response to what the user said in ${
             selectedStyle.name
           } style.
-          - For food preferences, suggest restaurants or dishes that match their preferences
-          - For nutritional inquiries, provide helpful general information
-          - For greetings, welcome them to the food recommendation service
+        
           
           STRICT FORMAT RULES:
-          - DO NOT identify yourself as a cooking assistant or recipe guide
           - DO NOT include any markdown formatting
           - DO NOT include explanations or additional text
           - Only return a valid JSON object, nothing else
@@ -542,8 +539,12 @@ export const useChatLogic = ({
         activeMenu = await getMenuItemsByFile(activeRestroId);
       }
 
-      console.log("activeMenu");
-      console.log(activeMenu);
+      let cleanMenu = activeMenu.map((ele) => {
+        return { title: ele.title, product_type: ele.product_type, id: ele.id };
+      });
+
+      console.log("cleanMenu");
+      console.log(cleanMenu);
       const analysisPart = isImageBased
         ? imageCaption
           ? `analyze the image description: "${userInput}" along with user's comment: "${imageCaption}"`
@@ -556,7 +557,7 @@ export const useChatLogic = ({
           activeRestroId ? "a shopify store" : "multiple shopify stores"
         }: ${
         activeRestroId
-          ? JSON.stringify(activeMenu)
+          ? JSON.stringify(cleanMenu)
           : JSON.stringify(restaurant1Menu) +
             " and " +
             JSON.stringify(restaurant2Menu)

@@ -47,7 +47,7 @@ export const DunkinOrderApp: React.FC = () => {
   // Set initial restaurant if needed
   useEffect(() => {
     const initialRestroId = 1;
-    const initialRestroName = "Shopify Store";
+    const initialRestroName = "CurateHome";
     const backImageUrl =
       "https://nextgalleriamalls.com/nextmusarambagh/wp-content/uploads/2024/02/pizzahut.png";
 
