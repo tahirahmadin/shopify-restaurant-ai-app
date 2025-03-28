@@ -540,7 +540,12 @@ export const useChatLogic = ({
       }
 
       let cleanMenu = activeMenu.map((ele) => {
-        return { title: ele.title, product_type: ele.product_type, id: ele.id };
+        return {
+          title: ele.title,
+          product_type: ele.product_type,
+          id: ele.id,
+          price: ele.variants[0].price,
+        };
       });
 
       console.log("cleanMenu");

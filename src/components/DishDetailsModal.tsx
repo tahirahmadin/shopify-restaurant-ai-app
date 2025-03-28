@@ -106,10 +106,7 @@ export const DishDetailsModal: React.FC<DishDetailsModalProps> = ({
               <p className="text-primary font-bold text-[12px]">{price} AED</p>
             </div>
             <div>
-              <p className="text-xs text-gray-600">
-                A delicious and satisfying dish prepared with the finest
-                ingredients. Perfect for any time of day.
-              </p>
+              <p className="text-xs text-gray-600">Description is missing.</p>
             </div>
 
             {isCustomisable && (
