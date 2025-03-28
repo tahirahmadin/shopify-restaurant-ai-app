@@ -23,6 +23,7 @@ interface MenuItemProps {
 export const ChatMenuItem: React.FC<MenuItemProps> = ({
   id,
   name,
+  description,
   price,
   restroId,
   restaurant,
@@ -214,6 +215,7 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
         }}
         id={id}
         name={name}
+        description={description}
         price={price}
         image={image}
         restroId={restroId}

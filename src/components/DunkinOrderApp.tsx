@@ -49,7 +49,7 @@ export const DunkinOrderApp: React.FC = () => {
     const initialRestroId = 1;
     const initialRestroName = "CurateHome";
     const backImageUrl =
-      "https://nextgalleriamalls.com/nextmusarambagh/wp-content/uploads/2024/02/pizzahut.png";
+      "https://www.curatehome.me/cdn/shop/files/5_300x.png?v=1684928640";
 
     if (initialRestroId && restaurantState.singleMode) {
       restaurantDispatch({

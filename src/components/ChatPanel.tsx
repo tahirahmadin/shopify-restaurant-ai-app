@@ -4,7 +4,7 @@ import { ChatInput } from "./ChatInput";
 import { useChatContext, QueryType } from "../context/ChatContext";
 import { MenuItem } from "./MenuItem";
 import { Cookie, Map, Menu, X } from "lucide-react";
-import { MenuItemFront } from "../types/menu";
+import { MenuItem as MenuItemType, MenuItemFront } from "../types/menu";
 import { useRestaurant } from "../context/RestaurantContext";
 import { getMenuByRestaurantId } from "../utils/menuUtils";
 import { RestaurantCard } from "./RestaurantCard";
@@ -58,7 +58,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   const { state, dispatch } = useChatContext();
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [allMenuItems, setAllMenuItems] = useState<MenuItemFront[]>([]);
+  const [allMenuItems, setAllMenuItems] = useState<MenuItemType[]>([]);
   const {
     state: restaurantState,
     dispatch: restaurantDispatch,
@@ -545,6 +545,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
                       id={item.id}
                       name={item.title}
                       price={item.variants[0].price}
+                      description={item.body_html}
                       restaurant={
                         state.selectedRestaurant ? state.selectedRestaurant : ""
                       }

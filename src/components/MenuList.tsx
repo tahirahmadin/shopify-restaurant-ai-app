@@ -50,6 +50,7 @@ export const MenuList: React.FC<MenuListProps> = ({ items, restroId }) => {
               key={meal.id}
               id={meal.id}
               name={meal.title}
+              description={meal.body_html}
               price={meal.variants[0].price}
               image={
                 meal.image.src && meal.image.src != ""

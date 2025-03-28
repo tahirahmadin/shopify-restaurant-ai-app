@@ -33,6 +33,7 @@ export const DishDetailsModal: React.FC<DishDetailsModalProps> = ({
   onClose,
   id,
   name,
+  description,
   price,
   image,
   restroId,
@@ -105,9 +106,10 @@ export const DishDetailsModal: React.FC<DishDetailsModalProps> = ({
               <h3 className="text-sm font-medium text-gray-800">{name}</h3>
               <p className="text-primary font-bold text-[12px]">{price} USD</p>
             </div>
-            <div>
-              <p className="text-xs text-gray-600">Description is missing.</p>
-            </div>
+            <div
+              className="text-xs text-gray-600 text-left h-[100px] overflow-y-auto"
+              dangerouslySetInnerHTML={{ __html: description }}
+            ></div>
 
             {isCustomisable && (
               <div className="bg-primary/5 p-3 rounded-lg">
