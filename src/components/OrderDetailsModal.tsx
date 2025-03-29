@@ -220,7 +220,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                       className="text-sm font-medium"
                       style={{ color: theme.modalMainText }}
                     >
-                      {item.price} USD
+                      {item.price} AED
                     </span>
                   </div>
                 ))}
@@ -277,7 +277,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                 className="text-lg font-bold"
                 style={{ color: theme.primary }}
               >
-                {(order.totalAmount / 100).toFixed(2)} USD
+                {(order.totalAmount / 100).toFixed(2)} AED
               </span>
             </div>
           </div>

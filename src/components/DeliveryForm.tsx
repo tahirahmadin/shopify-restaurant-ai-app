@@ -174,7 +174,7 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({ onSubmit }) => {
           className="w-full p-2 bg-primary text-white rounded-xl hover:bg-primary-600 transition-all shadow-lg flex items-center justify-center gap-2 text-xs"
         >
           <ShoppingBag className="w-4 h-4" />
-          Continue to Payment ({total} USD)
+          Continue to Payment ({total} AED)
         </button>
       </form>
     </div>

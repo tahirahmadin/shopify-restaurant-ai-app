@@ -47,42 +47,6 @@ export const DishDetailsModal: React.FC<DishDetailsModalProps> = ({
   const cartItem = state.cart.find((item) => item.id === id);
   const isInCart = Boolean(cartItem);
 
-  const handleAddToCart = () => {
-    if (isCustomisable && customisation) {
-      dispatch({
-        type: "SET_CUSTOMIZATION_MODAL",
-        payload: {
-          isOpen: true,
-          item: {
-            id,
-            name,
-            price,
-            image,
-            customisation,
-            restaurant,
-          },
-        },
-      });
-      onClose();
-      return;
-    }
-
-    // Check if cart has items from a different restaurant
-    const cartRestaurant = state.cart[0]?.restaurant;
-
-    // If cart is not empty and has items from a different restaurant
-    if (cartRestaurant && cartRestaurant !== restaurant) {
-      dispatch({ type: "CLEAR_CART" });
-    }
-
-    // Add item to cart
-    dispatch({
-      type: "ADD_TO_CART",
-      payload: { id, name, price, quantity: 1, restaurant },
-    });
-    onClose();
-  };
-
   if (!isOpen) return null;
 
   return (
@@ -104,7 +68,7 @@ export const DishDetailsModal: React.FC<DishDetailsModalProps> = ({
           <div className="space-y-1">
             <div className="flex flex-col">
               <h3 className="text-sm font-medium text-gray-800">{name}</h3>
-              <p className="text-primary font-bold text-[12px]">{price} USD</p>
+              <p className="text-primary font-bold text-[12px]">{price} AED</p>
             </div>
             <div
               className="text-xs text-gray-600 text-left h-[100px] overflow-y-auto"

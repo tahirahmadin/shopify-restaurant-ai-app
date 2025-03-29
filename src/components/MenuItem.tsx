@@ -114,7 +114,14 @@ export const MenuItem: React.FC<MenuItemProps> = ({
     // Add item to cart
     dispatch({
       type: "ADD_TO_CART",
-      payload: { id, name, price, quantity: 1, restaurant: restaurantName },
+      payload: {
+        id,
+        name,
+        price,
+        quantity: 1,
+        restaurant: restaurantName,
+        image: image,
+      },
     });
   };
 
@@ -178,7 +185,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
             className="font-bold text-[8px]"
             style={{ color: theme.menuItemPrice }}
           >
-            {price} USD
+            {price} AED
           </p>
         </div>
       </div>

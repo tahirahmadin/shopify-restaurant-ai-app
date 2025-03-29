@@ -415,7 +415,7 @@ export const SlidePanel: React.FC<SlidePanelProps> = ({ isOpen, onClose }) => {
                           className="text-sm font-medium"
                           style={{ color: theme.slideSecondText }}
                         >
-                          {item.price} USD
+                          {item.price} AED
                         </span>
                       </div>
                     ))}
@@ -475,7 +475,7 @@ export const SlidePanel: React.FC<SlidePanelProps> = ({ isOpen, onClose }) => {
                     className="text-lg font-bold"
                     style={{ color: theme.primary }}
                   >
-                    {(selectedOrder?.totalAmount / 100).toFixed(2)} USD
+                    {(selectedOrder?.totalAmount / 100).toFixed(2)} AED
                   </span>
                 </div>
               </div>
@@ -529,7 +529,7 @@ export const SlidePanel: React.FC<SlidePanelProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 <p className="text-lg font-bold text-gray-900">
-                  {userDetails.totalOrdersValue.toFixed(2)} USD
+                  {userDetails.totalOrdersValue.toFixed(2)} AED
                 </p>
                 <p className="text-[10px] text-gray-500">
                   ≈ {userDetails.totalOrders} orders
@@ -628,7 +628,7 @@ export const SlidePanel: React.FC<SlidePanelProps> = ({ isOpen, onClose }) => {
                               className="text-xs font-medium "
                               style={{ color: theme.primary }}
                             >
-                              {(order.totalAmount / 100).toFixed(2)} USD
+                              {(order.totalAmount / 100).toFixed(2)} AED
                             </p>
                             <div className="flex items-center gap-1">
                               <span
@@ -678,7 +678,7 @@ export const SlidePanel: React.FC<SlidePanelProps> = ({ isOpen, onClose }) => {
                                 {item.quantity}x {item.name}
                               </span>
                               <span className="text-[11px] opacity-80">
-                                {item.price} USD
+                                {item.price} AED
                               </span>
                             </div>
                           ))}

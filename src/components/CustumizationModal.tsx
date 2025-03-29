@@ -226,7 +226,7 @@ export const CustomizationModal: React.FC = () => {
               <h2 className="text-base font-semibold text-gray-800">
                 {item.name}
               </h2>
-              <p className="text-xs text-gray-500 mt-0.5">{item.price} USD</p>
+              <p className="text-xs text-gray-500 mt-0.5">{item.price} AED</p>
             </div>
             <button
               onClick={handleClose}
@@ -286,7 +286,7 @@ export const CustomizationModal: React.FC = () => {
                     </div>
                     {option.price > 0 && (
                       <span className="text-xs text-gray-500">
-                        +{option.price.toFixed(2)} USD
+                        +{option.price.toFixed(2)} AED
                       </span>
                     )}
                   </label>
@@ -321,7 +321,7 @@ export const CustomizationModal: React.FC = () => {
             <div>
               <p className="text-xs text-gray-500">Total</p>
               <p className="text-base font-bold text-primary">
-                {calculateTotal()} USD
+                {calculateTotal()} AED
               </p>
             </div>
           </div>

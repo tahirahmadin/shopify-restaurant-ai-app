@@ -140,7 +140,7 @@ export const CartSummary: React.FC = () => {
           }}
         >
           <ShoppingBag className="w-4 h-4" />
-          <span className="font-medium text-xs">{cartTotal} USD</span>
+          <span className="font-medium text-xs">{cartTotal} AED</span>
           <span
             className="px-2 py-0.5 rounded-full text-xs"
             style={{
@@ -174,6 +174,8 @@ export const CartSummary: React.FC = () => {
               />
             </div>
             <div className="max-h-64 overflow-y-auto">
+              {console.log("state.cart")}
+              {console.log(state.cart)}
               {state.cart.map((item) => {
                 return (
                   <div
@@ -210,7 +212,7 @@ export const CartSummary: React.FC = () => {
                                     color: theme.modalMainText,
                                   }}
                                 >
-                                  (+{customization.selection.price} USD)
+                                  (+{customization.selection.price} AED)
                                 </span>
                               )}
                             </div>
@@ -242,7 +244,7 @@ export const CartSummary: React.FC = () => {
                           color: theme.modalMainText,
                         }}
                       >
-                        {item.price} USD
+                        {item.price} AED
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -304,7 +306,7 @@ export const CartSummary: React.FC = () => {
             >
               <div className="flex justify-between mb-4">
                 <span className="font-medium ">Total</span>
-                <span className="font-bold ">{cartTotal} USD</span>
+                <span className="font-bold ">{cartTotal} AED</span>
               </div>
               <button
                 onClick={handleCheckout}

@@ -53,7 +53,7 @@ export const MenuList: React.FC<MenuListProps> = ({ items, restroId }) => {
               description={meal.body_html}
               price={meal.variants[0].price}
               image={
-                meal.image.src && meal.image.src != ""
+                meal.image && meal.image.src != ""
                   ? meal.image.src
                   : "https://i.pinimg.com/originals/da/4f/c2/da4fc2360e1dcc5c85cf5eeaee4b107f.gif"
               }
