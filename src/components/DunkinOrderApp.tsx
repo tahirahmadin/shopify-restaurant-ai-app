@@ -317,7 +317,7 @@ export const DunkinOrderApp: React.FC = () => {
             />
             <Filters />
           </div>
-          <div className="flex-1 mt-[120px] overflow-auto pb-25">
+          <div className="flex-1 mt-[90px] overflow-auto pb-25">
             <ChatPanel
               input={input}
               setInput={setInput}

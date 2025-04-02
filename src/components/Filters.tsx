@@ -374,7 +374,7 @@ export const Filters: React.FC = () => {
       />
 
       {/* Navigation Section */}
-      <div className="flex justify-between items-center gap-4 mt-2 border-t border-gray-100 pt-2">
+      {/* <div className="flex justify-between items-center gap-4 mt-2 border-t border-gray-100 pt-2">
         <button
           onClick={() => dispatch({ type: "SET_MODE", payload: "chat" })}
           className="flex items-center gap-1 transition-colors"
@@ -421,7 +421,7 @@ export const Filters: React.FC = () => {
           <Menu className="w-4 h-4" />
           <span className="text-sm">BROWSE</span>
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

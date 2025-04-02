@@ -2,6 +2,7 @@ import { QueryType } from "../../context/ChatContext";
 import { generateLLMResponse } from "../../actions/serverActions";
 import { getMenuByRestaurantId } from "../../utils/menuUtils";
 import { filterRestaurantsByDistance } from "../../utils/distanceUtils";
+import { genAIResponse } from "../../actions/aiActions";
 
 interface RecommendedItem {
   id?: number;
@@ -70,28 +71,23 @@ const getLLMCacheKey = (
   temperature: number
 ) => `${prompt}-${maxTokens}-${model}-${temperature}`;
 
-const getCachedLLMResponse = async (
-  prompt: string,
-  maxTokens: number,
-  model: string,
-  temperature: number
-) => {
-  const key = getLLMCacheKey(prompt, maxTokens, model, temperature);
-  const now = Date.now();
+const getCachedLLMResponse = async (messages: any) => {
+  // const key = getLLMCacheKey(prompt, maxTokens, model, temperature);
+  // const now = Date.now();
 
-  if (llmCache.has(key)) {
-    const entry = llmCache.get(key)!;
-    if (now - entry.timestamp < LLM_CACHE_TTL) {
-      if (entry.value) return entry.value;
-      if (entry.promise) return await entry.promise;
-    }
-  }
+  // if (llmCache.has(key)) {
+  //   const entry = llmCache.get(key)!;
+  //   if (now - entry.timestamp < LLM_CACHE_TTL) {
+  //     if (entry.value) return entry.value;
+  //     if (entry.promise) return await entry.promise;
+  //   }
+  // }
 
-  const promise = generateLLMResponse(prompt, maxTokens, model, temperature);
-  llmCache.set(key, { value: null, timestamp: now, promise });
+  const promise = genAIResponse(messages);
+  // llmCache.set(key, { value: null, timestamp: now, promise });
   const response = await promise;
 
-  llmCache.set(key, { value: response, timestamp: Date.now() });
+  // llmCache.set(key, { value: response, timestamp: Date.now() });
   return response;
 };
 
@@ -561,12 +557,12 @@ export const useChatLogic = ({
         Given the items from ${
           activeRestroId ? "a shopify store" : "multiple shopify stores"
         }: ${
-        activeRestroId
-          ? JSON.stringify(cleanMenu)
-          : JSON.stringify(restaurant1Menu) +
-            " and " +
-            JSON.stringify(restaurant2Menu)
-      },
+          activeRestroId
+            ? JSON.stringify(cleanMenu)
+            : JSON.stringify(restaurant1Menu) +
+              " and " +
+              JSON.stringify(restaurant2Menu)
+        },
         ${analysisPart}
         ${
           conversationContext
@@ -594,12 +590,9 @@ export const useChatLogic = ({
           - DO NOT include any special character before and after the json.
           - Only return a valid JSON object, nothing else.
       `;
-      const menuResponse = await getCachedLLMResponse(
-        menuPrompt,
-        400,
-        state.selectedModel,
-        0.5
-      );
+
+      let messagesContent = [{ id: 1, content: userInput, role: "user" }];
+      const menuResponse = await getCachedLLMResponse(messagesContent);
 
       if ((suggestRestroIds.length > 0 || activeRestroId) && menuResponse) {
         dispatch({
