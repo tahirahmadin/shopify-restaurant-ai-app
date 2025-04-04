@@ -10,34 +10,8 @@ interface MenuListProps {
   restroId: number;
 }
 
-export const MenuList: React.FC<MenuListProps> = ({ items, restroId }) => {
+export const MenuList: React.FC<MenuListProps> = ({ items }) => {
   const { state } = useChatContext();
-  const { state: restaurantState, dispatch: restaurantDispatch } =
-    useRestaurant();
-  const [menuItems, setMenuItems] = React.useState<any[]>([]);
-
-  React.useEffect(() => {
-    const fetchMenuItems = async () => {
-      if (!restaurantState.menus[restroId]) {
-        const items = await getMenuByRestaurantId(
-          restroId,
-          restaurantState,
-          restaurantDispatch
-        );
-        setMenuItems(items);
-      } else {
-        setMenuItems(restaurantState.menus[restroId]);
-      }
-    };
-    fetchMenuItems();
-  }, [restroId, restaurantState, restaurantDispatch]);
-
-  const filteredMenuItems = useMemo(() => {
-    const idSet = new Set<number>(items);
-    console.log(menuItems);
-    console.log(idSet);
-    return menuItems.filter((menuItem) => idSet.has(menuItem.id));
-  }, [items, menuItems]);
 
   return (
     <div className="flex flex-col gap-1">
@@ -45,20 +19,22 @@ export const MenuList: React.FC<MenuListProps> = ({ items, restroId }) => {
       <div className="overflow-x-auto w-[250px]">
         {/* Flex container that takes exact width of menu items */}
         <div className="flex items-center gap-1 w-max">
-          {filteredMenuItems.map((meal) => (
+          {console.log("items")}
+          {console.log(items)}
+          {items.map((meal) => (
             <ChatMenuItem
               key={meal.id}
               id={meal.id}
               name={meal.title}
               description={meal.body_html}
-              price={meal.variants[0].price}
+              price={meal.price}
               image={
-                meal.image && meal.image.src != ""
-                  ? meal.image.src
+                meal?.images != ""
+                  ? meal.images
                   : "https://i.pinimg.com/originals/da/4f/c2/da4fc2360e1dcc5c85cf5eeaee4b107f.gif"
               }
-              restroId={restroId}
-              isCustomisable={meal.isCustomisable}
+              restroId={0}
+              isCustomisable={false}
               customisation={meal.customisation}
             />
           ))}

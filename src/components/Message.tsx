@@ -58,7 +58,7 @@ export const Message: React.FC<MessageProps> = ({ message, onRetry }) => {
               style={{ maxHeight: "180px" }}
             />
           </div>
-          
+
           {message.text && message.text !== "Image uploaded" && (
             <div className="max-w-[180px] px-2 pt-1 text-sm">
               {message.text}
@@ -90,11 +90,7 @@ export const Message: React.FC<MessageProps> = ({ message, onRetry }) => {
         }}
       >
         {message.isBot && isLoading && !showTypingEffect && !typingComplete ? (
-          <MessageSkeleton
-            type={
-              message.llm?.output?.items1?.length > 0 ? "restaurant" : "menu"
-            }
-          />
+          <MessageSkeleton type={"menu"} />
         ) : showTypingEffect && !typingComplete ? (
           <div className="pr-3 flex-shrink-0 flex">
             {selectedStyle && (

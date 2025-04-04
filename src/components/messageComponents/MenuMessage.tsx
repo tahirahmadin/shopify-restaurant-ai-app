@@ -69,8 +69,13 @@ export const MenuMessage: React.FC<MenuMessageProps> = ({
       rating: restaurant.rating?.toFixed(1) || "4.7",
     };
   };
-
-  if (!message.llm) {
+  {
+    console.log("message print kro");
+  }
+  {
+    console.log(message);
+  }
+  if (message.queryType === "GENERAL") {
     return (
       <div className="pr-3 flex-shrink-0 flex">
         {message.isBot && selectedStyle && (
@@ -98,9 +103,9 @@ export const MenuMessage: React.FC<MenuMessageProps> = ({
         </p>
       </div>
 
-      {message.llm.output.items1?.length > 0 && (
+      {message.items?.length > 0 && (
         <>
-          {!restaurantState.cashMode && (
+          {/* {!restaurantState.cashMode && (
             <div className="flex items-center gap-2 mt-2">
               <button
                 onClick={() =>
@@ -116,51 +121,11 @@ export const MenuMessage: React.FC<MenuMessageProps> = ({
                   )}
                 </span>
               </button>
-
-              <RestaurantBadges
-                {...getRestaurantDetails(message.llm.restroIds[0])}
-              />
             </div>
-          )}
+          )} */}
 
           <div className="mt-2 pl-3 flex items-center gap-2 relative">
-            <MenuList
-              messageId={message.id}
-              items={message.llm.output.items1}
-              restroId={message.llm.restroIds[0]}
-            />
-          </div>
-        </>
-      )}
-
-      {message.llm.output.items2?.length > 0 && (
-        <>
-          <div className="flex items-center gap-2 mt-2">
-            <button
-              onClick={() =>
-                message.llm?.restroIds?.[1] &&
-                handleSelectRestro(message.llm.restroIds[1])
-              }
-              className="flex items-center gap-1.5 bg-blue-500 text-white px-2 py-0.5 rounded-full text-[10px] font-medium hover:bg-blue-600 transition-colors"
-            >
-              <span>
-                {menuUtils.getRestaurantNameById(
-                  restaurantState.restaurants,
-                  message.llm?.restroIds?.[1] || 0
-                )}
-              </span>
-            </button>
-            <RestaurantBadges
-              {...getRestaurantDetails(message.llm.restroIds[1])}
-            />
-          </div>
-
-          <div className="mt-2 pl-3 flex items-center gap-2">
-            <MenuList
-              messageId={message.id}
-              items={message.llm.output.items2}
-              restroId={message.llm.restroIds[1]}
-            />
+            <MenuList messageId={message.id} items={message.items} />
           </div>
         </>
       )}

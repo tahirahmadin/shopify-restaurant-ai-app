@@ -15,7 +15,7 @@ export const generateLLMResponse = async (messages: any): Promise<any> => {
     );
 
     if (response.data && !response.data.error) {
-      return response.data.result;
+      return response.data;
     }
     throw new Error("Failed to generate LLM response");
   } catch (error) {

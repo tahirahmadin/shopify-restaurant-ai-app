@@ -2,7 +2,6 @@ import { QueryType } from "../../context/ChatContext";
 import { generateLLMResponse } from "../../actions/serverActions";
 import { getMenuByRestaurantId } from "../../utils/menuUtils";
 import { filterRestaurantsByDistance } from "../../utils/distanceUtils";
-import { genAIResponse } from "../../actions/aiActions";
 
 interface RecommendedItem {
   id?: number;
@@ -83,12 +82,8 @@ const getCachedLLMResponse = async (messages: any) => {
   //   }
   // }
 
-  const promise = genAIResponse(messages);
-  // llmCache.set(key, { value: null, timestamp: now, promise });
-  const response = await promise;
-
   // llmCache.set(key, { value: response, timestamp: Date.now() });
-  return response;
+  return true;
 };
 
 const isGreetingOnly = (query: string): boolean => {
@@ -394,232 +389,45 @@ export const useChatLogic = ({
     return await promise;
   };
 
-  const handleMenuQuery = async (
-    _queryType: QueryType,
-    userInput: string,
-    isImageBased: boolean = false,
-    imageCaption: string = ""
-  ) => {
+  const handleMenuQuery = async (messages: any) => {
     try {
       const now = new Date().toLocaleString("en-US", {
         hour: "numeric",
         minute: "numeric",
         hour12: true,
       });
-
-      const effectiveInput =
-        isImageBased && imageCaption
-          ? `Image shows: ${userInput}. User says: ${imageCaption}`
-          : userInput;
-
-      const queryType = isImageBased
-        ? QueryType.MENU_QUERY
-        : await classifyIntent(
-            effectiveInput,
-            restaurantState.activeRestroId,
-            state,
-            chatHistory,
-            isImageBased
-          );
-
-      const conversationContext = buildConversationContext(
-        chatHistory.filter((msg) => !msg.isBot)
-      );
-
-      if (queryType === QueryType.GENERAL) {
-        if (isGreetingOnly(effectiveInput)) {
-          const friendlyResponseText = "Hello! How can I help you today?";
-          dispatch({
-            type: "ADD_MESSAGE",
-            payload: {
-              id: Date.now() + 1,
-              text: JSON.stringify({ text: friendlyResponseText }),
-              isBot: true,
-              time: now,
-              queryType,
-            },
-          });
-          return;
-        } else {
-          const genericPrompt = `
-          You are Gobbl, a item recommendation bot. Your task is to handle general queries that don't directly relate to ordering items or store information.
-          
-          These general queries include:
-          * Greetings (e.g., "Hello", "Hi there")
-          * Product inquiries (e.g., "How many years of warranty it has?", "What are the technical info of this item?") - provide general information about product
-          * General conversation (e.g., "Thank you", "How are you?")
-          The user said: "${effectiveInput}"
-          ${conversationContext ? `Context: "${conversationContext}"` : ""}
-          
-          Return your answer in a JSON object with the following format:
-          { "text": "your answer" }
-          
-          where:
-          - "text" provides a brief and creative response to what the user said in ${
-            selectedStyle.name
-          } style.
-        
-          
-          STRICT FORMAT RULES:
-          - DO NOT include any markdown formatting
-          - DO NOT include explanations or additional text
-          - Only return a valid JSON object, nothing else
-        `;
-          const genericResponse = await getCachedLLMResponse(
-            genericPrompt,
-            200,
-            state.selectedModel,
-            0.5
-          );
-          dispatch({
-            type: "ADD_MESSAGE",
-            payload: {
-              id: Date.now() + 1,
-              text: genericResponse.text,
-              isBot: true,
-              time: now,
-              queryType,
-            },
-          });
-          return;
-        }
-      }
-
-      let restaurant1Menu: any[] = [],
-        restaurant2Menu: any[] = [],
-        activeMenu: any[] = [];
-      let suggestRestroText = "";
-      let suggestRestroIds: number[] = [];
-      const { activeRestroId } = restaurantState;
-
-      if (!activeRestroId) {
-        const response = await handleRestaurantQuery(
-          isImageBased ? effectiveInput : undefined
-        );
-        suggestRestroText = response.text;
-        suggestRestroIds = response.restroIds;
-        if (queryType === QueryType.RESTAURANT_QUERY) {
-          dispatch({
-            type: "ADD_MESSAGE",
-            payload: {
-              id: Date.now() + 1,
-              text: suggestRestroText,
-              llm: {
-                output: {
-                  text: suggestRestroText,
-                  items1: [],
-                  items2: [],
-                  restroIds: suggestRestroIds,
-                },
-                restroIds: suggestRestroIds,
-              },
-              isBot: true,
-              time: now,
-              queryType,
-            },
-          });
-          return;
-        }
-        if (suggestRestroIds.length > 0) {
-          setRestaurants(suggestRestroIds);
-          const menus = await Promise.all([
-            getMenuItemsByFile(suggestRestroIds[0]),
-            suggestRestroIds.length > 1
-              ? getMenuItemsByFile(suggestRestroIds[1])
-              : Promise.resolve([]),
-          ]);
-          restaurant1Menu = menus[0];
-          restaurant2Menu = menus[1];
-        }
-      } else {
-        activeMenu = await getMenuItemsByFile(activeRestroId);
-      }
-
-      let cleanMenu = activeMenu.map((ele) => {
+      // Remove the first object from the array
+      messages.shift();
+      console.log(messages);
+      // Iterate through and transform the array
+      // Iterate through and transform the array
+      let formattedMessages = messages.map(({ id, isBot, text, items }) => {
+        let itemTitles = items
+          ? items.map((item) => item.title).join(", ")
+          : "";
         return {
-          title: ele.title,
-          product_type: ele.product_type,
-          id: ele.id,
-          price: ele.variants[0].price,
+          id,
+          role: isBot ? "assistant" : "user",
+          content:
+            text + (itemTitles ? " and items recommended: " + itemTitles : ""),
         };
       });
 
-      console.log("cleanMenu");
-      console.log(cleanMenu);
-      const analysisPart = isImageBased
-        ? imageCaption
-          ? `analyze the image description: "${userInput}" along with user's comment: "${imageCaption}"`
-          : `analyze the image description: "${userInput}"`
-        : `analyze the user's query: "${userInput}"`;
+      console.log("formattedMessages");
+      console.log(formattedMessages);
+      const menuResponse = await generateLLMResponse(formattedMessages);
+      console.log("menuResponse");
+      console.log(menuResponse);
 
-      const menuPrompt = `
-        You are a item recommendation system.
-        Given the items from ${
-          activeRestroId ? "a shopify store" : "multiple shopify stores"
-        }: ${
-          activeRestroId
-            ? JSON.stringify(cleanMenu)
-            : JSON.stringify(restaurant1Menu) +
-              " and " +
-              JSON.stringify(restaurant2Menu)
-        },
-        ${analysisPart}
-        ${
-          conversationContext
-            ? `Also, consider the following conversation context: "${conversationContext}"`
-            : ""
-        }
-        and return a JSON response: ${
-          activeRestroId
-            ? `{ "text": "", "items1": [] }`
-            : `{ "text": "", "items1": [], "items2": [] }`
-        }
-        where:
-          - "text" provides a concise and creative response and reasoning showing you understand the query in ${
-            selectedStyle.name
-          } style.
-          - ${
-            activeRestroId
-              ? `"items1" is array contains id of up to 5 recommended items.`
-              : `"items1" and "items2" contains id of up to 5 relevant items each.`
-          }
-          ${isVegOnly ? " Provide only VEGETARIAN options." : ""}
-        STRICT FORMAT RULES:
-          - DO NOT include any markdown formatting.
-          - DO NOT include explanations or additional text.
-          - DO NOT include any special character before and after the json.
-          - Only return a valid JSON object, nothing else.
-      `;
-
-      let messagesContent = [{ id: 1, content: userInput, role: "user" }];
-      const menuResponse = await getCachedLLMResponse(messagesContent);
-
-      if ((suggestRestroIds.length > 0 || activeRestroId) && menuResponse) {
+      if (menuResponse) {
         dispatch({
           type: "ADD_MESSAGE",
           payload: {
             id: Date.now() + 1,
-
-            recommendedItems: menuResponse.items1 || [],
+            items: menuResponse.items || [],
             text: menuResponse.text,
-            llm: {
-              output: menuResponse,
-              restroIds: activeRestroId ? [activeRestroId] : suggestRestroIds,
-            },
             isBot: true,
             time: now,
-            queryType,
-          },
-        });
-      } else {
-        dispatch({
-          type: "ADD_MESSAGE",
-          payload: {
-            id: Date.now() + 1,
-            text: suggestRestroText,
-            isBot: true,
-            time: now,
-            queryType: QueryType.GENERAL,
           },
         });
       }

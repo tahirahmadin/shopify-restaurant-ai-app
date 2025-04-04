@@ -156,8 +156,9 @@ export const DunkinOrderApp: React.FC = () => {
       setInput("");
       dispatch({ type: "SET_LOADING", payload: true });
 
+      let allMessages = [...state.messages, userMessage];
       try {
-        await chatLogic.handleMenuQuery(queryType, trimmedInput);
+        await chatLogic.handleMenuQuery(allMessages);
       } catch (error) {
         console.error("Error processing AI response:", error);
         dispatch({
@@ -223,7 +224,8 @@ export const DunkinOrderApp: React.FC = () => {
       dispatch({ type: "ADD_MESSAGE", payload: userMessage });
 
       dispatch({ type: "SET_LOADING", payload: true });
-      await chatLogic.handleMenuQuery(queryType, transcript);
+
+      let allMessages = await chatLogic.handleMenuQuery(queryType, transcript);
     } catch (error) {
       console.error("Error with speech recognition:", error);
       dispatch({
