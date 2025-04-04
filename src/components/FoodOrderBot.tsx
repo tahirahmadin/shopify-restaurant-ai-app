@@ -8,6 +8,7 @@ import { DunkinOrderApp } from "./DunkinOrderApp";
 import { CustomizationModal } from "./CustumizationModal";
 import { AddressModal } from "./AddressModal";
 import { FiltersProvider } from "../context/FiltersContext";
+import Testing from "./Testing";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
@@ -27,6 +28,7 @@ export const FoodOrderBot = () => {
               <FiltersProvider>
                 <ChatProvider>
                   <>
+                    {/* <Testing /> */}
                     <DunkinOrderApp />
                     <CustomizationModal />
                     <AddressModal />

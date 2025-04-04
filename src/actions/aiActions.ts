@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createOpenAI } from "@ai-sdk/openai";
-import { streamText } from "ai";
+import { streamText, generateText } from "ai";
 
 import getTools from "./ai-tools";
 
@@ -28,17 +28,18 @@ After purchasing a product tell the customer they've made a great choice and the
 
 export const genAIResponse = async (messages: any) => {
   const tools = await getTools();
-
+  console.log("tools");
+  console.log(tools);
   try {
-    const result = streamText({
+    const result = generateText({
       model: openAi("gpt-4o"),
       messages,
       system: SYSTEM_PROMPT,
       maxSteps: 20,
       tools,
     });
-
-    return result.toDataStreamResponse();
+    console.log(result);
+    return result;
   } catch (error) {
     console.error("Error in genAIResponse:", error);
     if (error instanceof Error && error.message.includes("rate limit")) {

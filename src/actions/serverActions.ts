@@ -5,26 +5,12 @@ let apiUrl: string = import.meta.env.VITE_PUBLIC_BACKEND_API_URL;
 let accessToken: string = import.meta.env.VITE_PUBLIC_SHOPIFY_KEY;
 
 // LLM API function
-export const generateLLMResponse = async (
-  systemPrompt: string,
-  maxTokens: number = 1000,
-  model: string = "OPENAI",
-  temperature: number = 0.5
-): Promise<any> => {
+export const generateLLMResponse = async (messages: any): Promise<any> => {
   try {
     const response = await axios.post(
-      `${apiUrl}/llm/generateText`,
+      `https://aggregator.gobbl.ai/api/llm/generateText`,
       {
-        systemPrompt,
-        maxTokens,
-        model,
-        temperature,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        messages,
       }
     );
 

@@ -31,6 +31,7 @@ interface ChatInputProps {
 }
 import { useFiltersContext } from "../context/FiltersContext";
 import { genAIResponse } from "../actions/aiActions";
+import { generateLLMResponse } from "../actions/serverActions";
 
 export const ChatInput: React.FC<ChatInputProps> = ({
   input,
@@ -332,16 +333,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         <button
           type="submit"
           className="p-1 text-gray-400 hover:text-gray-600"
-          // disabled={addresses.length === 0}
-          onClick={() =>
-            genAIResponse([
-              {
-                id: 1,
-                role: "user",
-                content: "What is the best Kurta here?",
-              },
-            ])
-          }
+          disabled={addresses.length === 0}
         >
           <Send className="w-5 h-5" />
         </button>
