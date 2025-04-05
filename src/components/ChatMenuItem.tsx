@@ -54,26 +54,7 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
     setRestaurantName(name);
   }, [restroId, restaurantState.restaurants]);
 
-  const handleSelectRestro = (restroId: number) => {
-    // If clicking on already active restaurant, clear selection
-    if (restaurantState.activeRestroId === restroId) {
-    } else {
-      setActiveRestaurant(restroId);
-      const restaurantName = menuUtils.getRestaurantNameById(
-        restaurantState.restaurants,
-        restroId
-      );
-      if (restaurantName !== "Unknown Restaurant") {
-        dispatch({
-          type: "SET_SELECTED_RESTAURANT",
-          payload: restaurantName,
-        });
-      }
-    }
-  };
-
   const handleCartAction = () => {
-    // If item is in cart, remove it
     if (isInCart) {
       dispatch({
         type: "REMOVE_FROM_CART",
@@ -82,12 +63,8 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
       return;
     }
 
-    // Check if cart has items from a different restaurant
     const cartRestaurant = state.cart[0]?.restaurant;
 
-    console.log(cartRestaurant);
-    console.log(restaurantName);
-    // If cart is not empty and has items from a different restaurant
     if (cartRestaurant && cartRestaurant !== restaurantName) {
       setIsCartChangeModalOpen(true);
       return;
@@ -111,7 +88,7 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
       return;
     }
 
-    // Add item to cart
+    // Add to local cart
     dispatch({
       type: "ADD_TO_CART",
       payload: {
@@ -123,7 +100,33 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
         image: image,
       },
     });
-    handleSelectRestro(restroId);
+
+    // Add to Shopify cart
+    const formData = {
+      items: [
+        {
+          id: id, // This should be a Shopify VARIANT ID
+          quantity: 1,
+        },
+      ],
+    };
+
+    fetch(`${window.Shopify?.routes?.root || "/"}cart/add.js`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(formData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Added to Shopify cart:", data);
+        // Optional: update cart count or show toast
+      })
+      .catch((error) => {
+        console.error("Shopify cart error:", error);
+      });
   };
 
   const handleCartChange = () => {
@@ -140,7 +143,6 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
         image: image,
       },
     });
-    handleSelectRestro(restroId);
     setIsCartChangeModalOpen(false);
   };
 
