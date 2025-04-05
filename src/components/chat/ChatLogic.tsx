@@ -2,6 +2,7 @@ import { QueryType } from "../../context/ChatContext";
 import { generateLLMResponse } from "../../actions/serverActions";
 import { getMenuByRestaurantId } from "../../utils/menuUtils";
 import { filterRestaurantsByDistance } from "../../utils/distanceUtils";
+import { genAIResponse } from "../../actions/aiActions";
 
 interface RecommendedItem {
   id?: number;
@@ -415,7 +416,7 @@ export const useChatLogic = ({
 
       console.log("formattedMessages");
       console.log(formattedMessages);
-      const menuResponse = await generateLLMResponse(formattedMessages);
+      const menuResponse = await genAIResponse(formattedMessages);
       console.log("menuResponse");
       console.log(menuResponse);
 

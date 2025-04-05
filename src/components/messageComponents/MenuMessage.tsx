@@ -69,12 +69,6 @@ export const MenuMessage: React.FC<MenuMessageProps> = ({
       rating: restaurant.rating?.toFixed(1) || "4.7",
     };
   };
-  {
-    console.log("message print kro");
-  }
-  {
-    console.log(message);
-  }
   if (message.queryType === "GENERAL") {
     return (
       <div className="pr-3 flex-shrink-0 flex">
