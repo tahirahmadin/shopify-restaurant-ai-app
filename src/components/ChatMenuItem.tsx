@@ -118,7 +118,7 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
       {
         type: "ADD_TO_CART",
         payload: {
-          id: 7191816405182, // numeric variant ID (not GID)
+          id: 45956834787380, // numeric variant ID (not GID)
           quantity: 2,
         },
       },
