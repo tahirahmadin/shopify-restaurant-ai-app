@@ -105,7 +105,7 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
     const formData = {
       items: [
         {
-          id: id, // This should be a Shopify VARIANT ID
+          id: "7191816405182", // This should be a Shopify VARIANT ID
           quantity: 1,
         },
       ],
