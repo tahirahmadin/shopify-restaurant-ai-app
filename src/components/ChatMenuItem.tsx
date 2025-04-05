@@ -52,6 +52,19 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
       restroId
     );
     setRestaurantName(name);
+
+    window.addEventListener("message", (event) => {
+      const { type, payload } = event.data;
+
+      if (type === "CART_SUCCESS") {
+        console.log("✅ Item added to cart:", payload);
+        // Show confirmation toast, update state, etc.
+      }
+
+      if (type === "CART_ERROR") {
+        console.error("❌ Failed to add item:", payload);
+      }
+    });
   }, [restroId, restaurantState.restaurants]);
 
   const handleCartAction = () => {
@@ -101,32 +114,16 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
       },
     });
 
-    // Add to Shopify cart
-    const formData = {
-      items: [
-        {
-          id: "7191816405182", // This should be a Shopify VARIANT ID
-          quantity: 1,
+    window.parent.postMessage(
+      {
+        type: "ADD_TO_CART",
+        payload: {
+          id: 7191816405182, // numeric variant ID (not GID)
+          quantity: 2,
         },
-      ],
-    };
-
-    fetch(`${window.Shopify?.shop || "/"}cart/add.js`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
       },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Added to Shopify cart:", data);
-        // Optional: update cart count or show toast
-      })
-      .catch((error) => {
-        console.error("Shopify cart error:", error);
-      });
+      "*"
+    );
   };
 
   const handleCartChange = () => {
