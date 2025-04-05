@@ -1,7 +1,5 @@
 interface Window {
   Shopify?: {
-    routes?: {
-      root?: string;
-    };
+    shop?: string;
   };
 }

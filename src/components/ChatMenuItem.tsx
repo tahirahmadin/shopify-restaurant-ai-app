@@ -111,7 +111,7 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
       ],
     };
 
-    fetch(`${window.Shopify?.routes?.root || "/"}cart/add.js`, {
+    fetch(`${window.Shopify?.shop || "/"}cart/add.js`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
