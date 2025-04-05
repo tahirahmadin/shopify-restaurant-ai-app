@@ -237,21 +237,7 @@ export const useChatLogic = ({
   addresses,
   chatHistory,
 }: ChatLogicProps) => {
-  const determineQueryType = (
-    query: string,
-    activeRestroId: number | null
-  ): QueryType => {
-    const restaurantKeywords = [
-      "restaurant",
-      "place",
-      "where",
-      "location",
-      "open",
-      "closed",
-      "timing",
-      "hours",
-      "address",
-    ];
+  const determineQueryType = (query: string): QueryType => {
     const menuKeywords = [
       "price",
       "cost",
@@ -266,11 +252,7 @@ export const useChatLogic = ({
       "what's good",
     ];
     query = query.toLowerCase();
-    if (
-      restaurantKeywords.some((keyword) => query.includes(keyword)) &&
-      !activeRestroId
-    )
-      return QueryType.RESTAURANT_QUERY;
+
     if (menuKeywords.some((keyword) => query.includes(keyword)))
       return QueryType.MENU_QUERY;
     return QueryType.GENERAL;
@@ -301,96 +283,7 @@ export const useChatLogic = ({
     return await promise;
   };
 
-  const handleRestaurantQuery = async (queryText?: string) => {
-    const selectedAddress = addresses[0];
-    let filteredRestaurants = restaurantState.restaurants;
-
-    if (selectedAddress?.coordinates) {
-      console.log("selectedAddress");
-      console.log(selectedAddress);
-      filteredRestaurants = filterRestaurantsByDistance(
-        selectedAddress.coordinates.lat,
-        selectedAddress.coordinates.lng,
-        restaurantState.restaurants,
-        5 // 10km radius
-      );
-    }
-
-    const restaurantContext = filteredRestaurants.map((ele: any) => ({
-      menuSummary: ele.menuSummary,
-      name: ele.name,
-      id: ele.id,
-      coordinates: ele.coordinates,
-    }));
-    const orderContextItem = [
-      ...new Set(
-        orders?.flatMap((ele) => ele.items?.map((itemObj) => itemObj.name)) ||
-          []
-      ),
-    ].join(", ");
-
-    const effectiveQuery = queryText !== undefined ? queryText : input;
-    const analysisText =
-      queryText !== undefined
-        ? `analyze the image description: "${effectiveQuery}"`
-        : `analyze the user's query: "${effectiveQuery}"`;
-
-    const conversationContext = buildConversationContext(
-      chatHistory.filter((msg) => !msg.isBot)
-    );
-
-    const key =
-      queryText !== undefined
-        ? `image-${effectiveQuery}-${filteredRestaurants
-            .map((r: any) => r.id)
-            .join(",")}`
-        : `${input}-${filteredRestaurants.map((r: any) => r.id).join(",")}`;
-
-    const now = Date.now();
-    if (restaurantQueryCache.has(key)) {
-      const entry = restaurantQueryCache.get(key)!;
-      if (entry.value && now - entry.timestamp < RESTAURANT_QUERY_CACHE_TTL) {
-        return entry.value;
-      }
-      if (entry.promise) {
-        return await entry.promise;
-      }
-    }
-
-    const promise = (async () => {
-      const systemPrompt = ` 
-      You are a restaurant recommendation system.
-      Given the following restaurants: ${JSON.stringify(restaurantContext)},
-      ${analysisText} and also consider previous order choices from ${orderContextItem}
-      ${
-        conversationContext
-          ? `and also consider the previous conversation: "${conversationContext}"`
-          : ""
-      }
-      and return exactly one JSON object:
-        { "restroIds": [] }
-      where:
-        - "restroIds" is an array of up to 2 matching restaurant IDs (numeric).
-      STRICT FORMAT RULES:
-        - Return only a valid JSON object with no extra text, explanations, or markdown.
-        - DO NOT include any special character before and after the json.
-        - No code fences, no trailing commas, no disclaimers.
-        - Only return a valid JSON object, nothing else.
-      `;
-      const response = await getCachedLLMResponse(
-        systemPrompt,
-        200,
-        state.selectedModel,
-        0.5
-      );
-      restaurantQueryCache.set(key, { value: response, timestamp: Date.now() });
-      return response;
-    })();
-    restaurantQueryCache.set(key, { value: null, timestamp: now, promise });
-    return await promise;
-  };
-
-  const handleMenuQuery = async (messages: any) => {
+  const handleMenuQuery = async (messages: any, latestMessage: any) => {
     try {
       const now = new Date().toLocaleString("en-US", {
         hour: "numeric",
@@ -401,21 +294,21 @@ export const useChatLogic = ({
       messages.shift();
       console.log(messages);
       // Iterate through and transform the array
-      // Iterate through and transform the array
-      let formattedMessages = messages.map(({ id, isBot, text, items }) => {
-        let itemTitles = items
-          ? items.map((item) => item.title).join(", ")
-          : "";
-        return {
-          id,
-          role: isBot ? "assistant" : "user",
-          content:
-            text + (itemTitles ? " and items recommended: " + itemTitles : ""),
-        };
-      });
+      let formattedMessages = [...messages, latestMessage].map(
+        ({ id, isBot, text, items }) => {
+          let itemTitles = items
+            ? items.map((item) => item.title).join(", ")
+            : "";
+          return {
+            id,
+            role: isBot ? "assistant" : "user",
+            content:
+              text +
+              (itemTitles ? " and items recommended: " + itemTitles : ""),
+          };
+        }
+      );
 
-      console.log("formattedMessages");
-      console.log(formattedMessages);
       const menuResponse = await genAIResponse(formattedMessages);
       console.log("menuResponse");
       console.log(menuResponse);
@@ -439,7 +332,6 @@ export const useChatLogic = ({
 
   return {
     getMenuItemsByFile,
-    handleRestaurantQuery,
     handleMenuQuery,
     determineQueryType,
     classifyIntent,

@@ -139,10 +139,7 @@ export const DunkinOrderApp: React.FC = () => {
         return;
       }
 
-      const queryType = chatLogic.determineQueryType(
-        trimmedInput,
-        restaurantState.activeRestroId
-      );
+      const queryType = chatLogic.determineQueryType(trimmedInput);
       const userMessage = {
         id: Date.now(),
         text: trimmedInput,
@@ -156,9 +153,8 @@ export const DunkinOrderApp: React.FC = () => {
       setInput("");
       dispatch({ type: "SET_LOADING", payload: true });
 
-      let allMessages = [...state.messages, userMessage];
       try {
-        await chatLogic.handleMenuQuery(allMessages);
+        await chatLogic.handleMenuQuery(state.messages, userMessage);
       } catch (error) {
         console.error("Error processing AI response:", error);
         dispatch({

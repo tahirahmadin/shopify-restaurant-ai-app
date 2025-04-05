@@ -37,7 +37,13 @@ export const genAIResponse = async (messages: any) => {
       maxSteps: 20,
       tools,
     });
-    let output = await result.then((res) => JSON.parse(res.text));
+    let output = await result.then((res) => {
+      try {
+        return JSON.parse(res.text);
+      } catch (e) {
+        return { text: res.text, items: [] };
+      }
+    });
     return output;
   } catch (error) {
     console.error("Error in genAIResponse:", error);
