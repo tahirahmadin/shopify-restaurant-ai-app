@@ -114,7 +114,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
               {restaurantState.cashMode && (
                 <a href={`/cart`}>
                   <button
-                    onClick={() => handlePaymentMethodSelect("cash")}
+                    // onClick={() => handlePaymentMethodSelect("cash")}
                     style={{
                       backgroundColor: theme.chatBubbleBg,
                       color: theme.chatBubbleText,

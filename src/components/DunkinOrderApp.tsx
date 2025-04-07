@@ -47,29 +47,29 @@ export const DunkinOrderApp: React.FC = () => {
   // Set initial restaurant if needed
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const sellerIdParam = params.get('sellerId');
+    const sellerIdParam = params.get("sellerId");
     console.log("Seller ID in URL:", sellerIdParam);
     const shopifyThemeColor = "#000000";
     const initialRestroName = "CurateHome";
     const backImageUrl =
       "https://www.curatehome.me/cdn/shop/files/5_300x.png?v=1684928640";
 
-      const sellerId = sellerIdParam;
+    const sellerId = sellerIdParam;
 
-      if (sellerId && restaurantState.singleMode) {
-        console.log("Seller ID:", sellerId);
-        
-        restaurantDispatch({
-          type: "SET_BACKGROUND_IMAGE",
-          payload: backImageUrl,
-        });
-        restaurantDispatch({
-          type: "SET_ACTIVE_RESTRO",
-          payload: sellerId,
-        });
-        dispatch({ type: "SET_SELECTED_RESTAURANT", payload: initialRestroName });
-      }
-    }, [restaurantState.singleMode]);
+    if (sellerId && restaurantState.singleMode) {
+      console.log("Seller ID:", sellerId);
+
+      restaurantDispatch({
+        type: "SET_BACKGROUND_IMAGE",
+        payload: backImageUrl,
+      });
+      restaurantDispatch({
+        type: "SET_ACTIVE_RESTRO",
+        payload: sellerId,
+      });
+      dispatch({ type: "SET_SELECTED_RESTAURANT", payload: initialRestroName });
+    }
+  }, [restaurantState.singleMode]);
 
   // Reset UI state when auth changes.
   useEffect(() => {
@@ -320,9 +320,9 @@ export const DunkinOrderApp: React.FC = () => {
               onOpenPanel={() => setIsPanelOpen(true)}
               onCartClick={() => setIsCartOpen(!isCartOpen)}
             />
-            <Filters />
+            {/* <Filters /> */}
           </div>
-          <div className="flex-1 mt-[90px] overflow-auto pb-25">
+          <div className="flex-1 mt-[50px] overflow-auto pb-25">
             <ChatPanel
               input={input}
               setInput={setInput}
