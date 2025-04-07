@@ -112,19 +112,19 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
                 </button>
               )}
               {restaurantState.cashMode && (
-                <a href={`/cart`} target="_blank">
-                  <button
-                    // onClick={() => handlePaymentMethodSelect("cash")}
-                    style={{
-                      backgroundColor: theme.chatBubbleBg,
-                      color: theme.chatBubbleText,
-                    }}
-                    className="flex-1 py-2 px-4 bg-primary text-white rounded-lg text-sm hover:bg-primary-600 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Coins className="w-4 h-4" />
-                    Proceed to Cart
-                  </button>
-                </a>
+                <button
+                  onClick={() => {
+                    window.parent.location.href = "/cart";
+                  }}
+                  style={{
+                    backgroundColor: theme.chatBubbleBg,
+                    color: theme.chatBubbleText,
+                  }}
+                  className="flex-1 py-2 px-4 bg-primary text-white rounded-lg text-sm hover:bg-primary-600 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Coins className="w-4 h-4" />
+                  Proceed to Cart
+                </button>
               )}
             </div>
           </div>
