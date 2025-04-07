@@ -64,7 +64,20 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
 
       if (type === "CART_UPDATED") {
         console.log("🟢 Parent confirmed cart update:", payload);
-        // Update your UI if needed
+
+        // Dispatch native Shopify cart events
+        document.dispatchEvent(new Event("shopify:cart:updated"));
+        document.dispatchEvent(new CustomEvent("cart:refresh"));
+
+        // Optional: you can call Shopify's cart drawer refresh if needed
+        if (
+          window.Shopify &&
+          Shopify.theme &&
+          Shopify.theme.cartDrawer &&
+          typeof Shopify.theme.cartDrawer.fetchCart === "function"
+        ) {
+          Shopify.theme.cartDrawer.fetchCart();
+        }
       }
 
       if (type === "CART_ERROR") {
