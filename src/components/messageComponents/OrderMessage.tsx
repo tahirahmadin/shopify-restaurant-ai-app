@@ -112,7 +112,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
                 </button>
               )}
               {restaurantState.cashMode && (
-                <a href={`/cart`}>
+                <a href={`/cart`} target="_blank">
                   <button
                     // onClick={() => handlePaymentMethodSelect("cash")}
                     style={{
