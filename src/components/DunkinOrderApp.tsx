@@ -46,24 +46,30 @@ export const DunkinOrderApp: React.FC = () => {
 
   // Set initial restaurant if needed
   useEffect(() => {
-    const initialSellerId = "67f37da61643b2c6fa7b5613";
+    const params = new URLSearchParams(window.location.search);
+    const sellerIdParam = params.get('sellerId');
+    console.log("Seller ID in URL:", sellerIdParam);
     const shopifyThemeColor = "#000000";
     const initialRestroName = "CurateHome";
     const backImageUrl =
       "https://www.curatehome.me/cdn/shop/files/5_300x.png?v=1684928640";
 
-    if (initialSellerId && restaurantState.singleMode) {
-      restaurantDispatch({
-        type: "SET_BACKGROUND_IMAGE",
-        payload: backImageUrl,
-      });
-      restaurantDispatch({
-        type: "SET_ACTIVE_RESTRO",
-        payload: initialSellerId,
-      });
-      dispatch({ type: "SET_SELECTED_RESTAURANT", payload: initialRestroName });
-    }
-  }, [restaurantState.singleMode]);
+      const sellerId = sellerIdParam;
+
+      if (sellerId && restaurantState.singleMode) {
+        console.log("Seller ID:", sellerId);
+        
+        restaurantDispatch({
+          type: "SET_BACKGROUND_IMAGE",
+          payload: backImageUrl,
+        });
+        restaurantDispatch({
+          type: "SET_ACTIVE_RESTRO",
+          payload: sellerId,
+        });
+        dispatch({ type: "SET_SELECTED_RESTAURANT", payload: initialRestroName });
+      }
+    }, [restaurantState.singleMode]);
 
   // Reset UI state when auth changes.
   useEffect(() => {
