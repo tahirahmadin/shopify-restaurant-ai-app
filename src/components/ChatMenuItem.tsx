@@ -53,19 +53,31 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
     );
     setRestaurantName(name);
 
-    window.addEventListener("message", (event) => {
+    const messageHandler = (event) => {
       const { type, payload } = event.data;
 
       if (type === "CART_SUCCESS") {
         console.log("✅ Item added to cart:", payload);
-        // Show confirmation toast, update state, etc.
+        // Optional: show toast or animation
         document.dispatchEvent(new Event("cart:refresh"));
+      }
+
+      if (type === "CART_UPDATED") {
+        console.log("🟢 Parent confirmed cart update:", payload);
+        // Update your UI if needed
       }
 
       if (type === "CART_ERROR") {
         console.error("❌ Failed to add item:", payload);
+        // Show error to user if needed
       }
-    });
+    };
+
+    window.addEventListener("message", messageHandler);
+
+    return () => {
+      window.removeEventListener("message", messageHandler);
+    };
   }, [restroId, restaurantState.restaurants]);
 
   const handleCartAction = () => {
@@ -119,7 +131,7 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
       {
         type: "ADD_TO_CART",
         payload: {
-          id: id, // numeric variant ID (not GID)
+          id: id, // Shopify numeric variant ID
           quantity: 1,
         },
       },
