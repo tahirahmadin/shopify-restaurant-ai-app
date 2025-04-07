@@ -59,6 +59,7 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
       if (type === "CART_SUCCESS") {
         console.log("✅ Item added to cart:", payload);
         // Show confirmation toast, update state, etc.
+        document.dispatchEvent(new Event("cart:refresh"));
       }
 
       if (type === "CART_ERROR") {
