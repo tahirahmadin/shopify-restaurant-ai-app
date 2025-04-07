@@ -298,7 +298,7 @@ export const getThemeForStyle = (styleName: string): Theme => {
     default: // Gobbl default theme
       return {
         // Base colors
-        primary: "#F87315",
+        primary: "#7556DF",
         secondary: "#FFF5F2",
         background: "#FFF8F5",
         text: "#1A1A1A",
@@ -307,7 +307,7 @@ export const getThemeForStyle = (styleName: string): Theme => {
         // Header specific
         headerBg: "#ffffff",
         headerText: "#1A1A1A",
-        headerIconColor: "#F87315",
+        headerIconColor: "#7556DF",
         headerHighlight: "#7556DF",
         headerBorder: "#FFE5E5",
 
