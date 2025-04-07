@@ -308,13 +308,13 @@ export const getThemeForStyle = (styleName: string): Theme => {
         headerBg: "#ffffff",
         headerText: "#1A1A1A",
         headerIconColor: "#F87315",
-        headerHighlight: "#F87315",
+        headerHighlight: "#7556DF",
         headerBorder: "#FFE5E5",
 
         // Filters section
         filtersBg: "#FFFFFF",
         filtersText: "#1A1A1A",
-        filtersIconColor: "#F87315",
+        filtersIconColor: "#7556DF",
         filtersBorder: "#E5E5E5",
         filtersButtonBg: "#F5F5F5",
         filtersButtonText: "#1A1A1A",
@@ -323,7 +323,7 @@ export const getThemeForStyle = (styleName: string): Theme => {
         // Chat panel
         chatBg: "#FFF8F5",
         chatText: "#1A1A1A",
-        chatBubbleBg: "#F87315",
+        chatBubbleBg: "#7556DF",
         chatBubbleText: "#FFFFFF",
         chatBubbleBotBg: "#FFF5F2",
         chatBubbleBotText: "#1A1A1A",
@@ -331,15 +331,15 @@ export const getThemeForStyle = (styleName: string): Theme => {
         // Menu item
         menuItemBg: "#F9FAFB", // Dark background (Kitchen ambiance)
         menuItemText: "#000000", // Light text for contrast
-        menuItemPrice: "#F87315", // Gold (Michelin-star premium quality)
+        menuItemPrice: "#7556DF", // Gold (Michelin-star premium quality)
 
         // Input panel
         inputBg: "#FFFFFF",
         inputText: "#1A1A1A",
         inputPlaceholder: "#757575",
         inputBorder: "#E5E5E5",
-        inputIconColor: "#F87315",
-        inputButtonBg: "#F87315",
+        inputIconColor: "#7556DF",
+        inputButtonBg: "#7556DF",
         inputButtonText: "#FFFFFF",
 
         // Quick actions
@@ -352,7 +352,7 @@ export const getThemeForStyle = (styleName: string): Theme => {
         cardBg: "#FFFFFF",
         cardText: "#1A1A1A",
         cardBorder: "#E5E5E5",
-        cardHighlight: "#F87315",
+        cardHighlight: "#7556DF",
 
         modalBg: "#FFF5F2", // Light warm background for a soft feel
         modalBgLight: "#FFE5E0", // Softer peach tone to maintain harmony
