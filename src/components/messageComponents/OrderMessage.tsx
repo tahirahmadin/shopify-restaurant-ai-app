@@ -30,8 +30,8 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
           method === "card"
             ? "credit/debit card"
             : method === "crypto"
-            ? "USDT"
-            : "Cash at Store"
+              ? "USDT"
+              : "Cash at Store"
         }.`,
         isBot: true,
         time: new Date().toLocaleString("en-US", {
@@ -112,17 +112,19 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
                 </button>
               )}
               {restaurantState.cashMode && (
-                <button
-                  onClick={() => handlePaymentMethodSelect("cash")}
-                  style={{
-                    backgroundColor: theme.chatBubbleBg,
-                    color: theme.chatBubbleText,
-                  }}
-                  className="flex-1 py-2 px-4 bg-primary text-white rounded-lg text-sm hover:bg-primary-600 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Coins className="w-4 h-4" />
-                  Cash at Store
-                </button>
+                <a href={`/cart`}>
+                  <button
+                    onClick={() => handlePaymentMethodSelect("cash")}
+                    style={{
+                      backgroundColor: theme.chatBubbleBg,
+                      color: theme.chatBubbleText,
+                    }}
+                    className="flex-1 py-2 px-4 bg-primary text-white rounded-lg text-sm hover:bg-primary-600 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Coins className="w-4 h-4" />
+                    Proceed to Cart
+                  </button>
+                </a>
               )}
             </div>
           </div>
