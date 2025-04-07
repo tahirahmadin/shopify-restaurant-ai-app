@@ -46,7 +46,7 @@ export const DunkinOrderApp: React.FC = () => {
 
   // Set initial restaurant if needed
   useEffect(() => {
-    const initialRestroId = "67f11ea39fe7d2568a932ce1";
+    const initialRestroId = "67f37da61643b2c6fa7b5613";
     const initialRestroName = "CurateHome";
     const backImageUrl =
       "https://www.curatehome.me/cdn/shop/files/5_300x.png?v=1684928640";

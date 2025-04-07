@@ -172,6 +172,30 @@ export const getAllRestaurants = async (
   }
 };
 
+// Get products by ids
+export const getProductsByIds = async (
+  ids: number[],
+  sellerId: string
+): Promise<MenuItem[]> => {
+  try {
+    const response = await axios.post(
+      `https://aggregator.gobbl.ai/api/shopify/getProductsByIds`,
+      {
+        ids,
+        sellerId,
+      }
+    );
+
+    if (response.data && response.data.result) {
+      return response.data.result;
+    }
+    return [];
+  } catch (error) {
+    console.error(`Error fetching menu for restaurant ${ids}:`, error);
+    return [];
+  }
+};
+
 // Get restaurant menu
 export const getRestaurantMenu = async (
   restaurantId: number

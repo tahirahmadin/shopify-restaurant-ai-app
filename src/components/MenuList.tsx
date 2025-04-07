@@ -23,11 +23,11 @@ export const MenuList: React.FC<MenuListProps> = ({ items }) => {
           {console.log(items)}
           {items.map((meal) => (
             <ChatMenuItem
-              key={meal.id}
-              id={meal.id}
+              key={meal.variantId}
+              id={meal.variantId}
               name={meal.title}
               description={meal.body_html}
-              price={meal.price}
+              price={meal.variantPrice}
               image={
                 meal?.images != ""
                   ? meal.images

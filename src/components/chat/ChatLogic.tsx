@@ -1,5 +1,8 @@
 import { QueryType } from "../../context/ChatContext";
-import { generateLLMResponse } from "../../actions/serverActions";
+import {
+  generateLLMResponse,
+  getProductsByIds,
+} from "../../actions/serverActions";
 import { getMenuByRestaurantId } from "../../utils/menuUtils";
 import { filterRestaurantsByDistance } from "../../utils/distanceUtils";
 import { genAIResponse } from "../../actions/aiActions";
@@ -309,7 +312,31 @@ export const useChatLogic = ({
         }
       );
 
-      const menuResponse = await genAIResponse(formattedMessages);
+      const SELLER_ID = restaurantState.activeRestroId;
+
+      const SYSTEM_PROMPT = `You are an item recommendation system. Whenever a user asks for item recommendation, you can use the getProducts tool by passing the sellerId as ${SELLER_ID} as a parameter getProducts(sellerId) to get the products
+    Do not send undefined or null values in getProducts tool call. You will return a JSON response: 
+        { "text": "", "items": [] }
+where:
+- "text" provides a concise and creative response and reasoning showing you understand the query in 
+- "items" is array contains object receieved from the tool call getProductsByIds
+       
+        STRICT FORMAT RULES:
+        - DO NOT include any markdown formatting.
+          - DO NOT include explanations or additional text.
+          - DO NOT include any special character before and after the json.
+          - Only return a valid JSON object, nothing else.`;
+
+      const menuResponse = await genAIResponse(
+        formattedMessages,
+        SYSTEM_PROMPT
+      );
+
+      if (menuResponse.items?.length > 0) {
+        let itemIds = menuResponse.items.map((item) => item.id);
+        let res = await getProductsByIds(itemIds, SELLER_ID);
+        menuResponse.items = res;
+      }
       console.log("menuResponse");
       console.log(menuResponse);
 
