@@ -46,19 +46,20 @@ export const DunkinOrderApp: React.FC = () => {
 
   // Set initial restaurant if needed
   useEffect(() => {
-    const initialRestroId = "67f37da61643b2c6fa7b5613";
+    const initialSellerId = "67f37da61643b2c6fa7b5613";
+    const shopifyThemeColor = "#000000";
     const initialRestroName = "CurateHome";
     const backImageUrl =
       "https://www.curatehome.me/cdn/shop/files/5_300x.png?v=1684928640";
 
-    if (initialRestroId && restaurantState.singleMode) {
+    if (initialSellerId && restaurantState.singleMode) {
       restaurantDispatch({
         type: "SET_BACKGROUND_IMAGE",
         payload: backImageUrl,
       });
       restaurantDispatch({
         type: "SET_ACTIVE_RESTRO",
-        payload: initialRestroId,
+        payload: initialSellerId,
       });
       dispatch({ type: "SET_SELECTED_RESTAURANT", payload: initialRestroName });
     }
