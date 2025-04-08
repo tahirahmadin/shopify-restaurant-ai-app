@@ -152,7 +152,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           <div className="grid grid-cols-2 gap-2 mb-1 max-h-[120px] overflow-y-auto">
             <button
               onClick={() =>
-                handleQuickAction("Show me Best Snowboard available")
+                handleQuickAction("Show me Cheap Snowboard available")
               }
               className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
               style={{
@@ -162,7 +162,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               type="button"
             >
               <Store className="w-3.5 h-3.5" />
-              <span>Best Snowboard ?</span>
+              <span>Cheap Snowboard ?</span>
             </button>
 
             <button
