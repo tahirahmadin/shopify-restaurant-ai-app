@@ -162,11 +162,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               type="button"
             >
               <Store className="w-3.5 h-3.5" />
-              <span>Best Snowboard available ?</span>
+              <span>Best Snowboard ?</span>
             </button>
 
             <button
-              onClick={() => handleQuickAction("Show me white sandals")}
+              onClick={() => handleQuickAction("Show me Ski Wax")}
               className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
               style={{
                 backgroundColor: theme.inputButtonBg,
@@ -175,12 +175,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               type="button"
             >
               <Store className="w-3.5 h-3.5" />
-              <span>White sandals ?</span>
+              <span>Ski Wax ?</span>
             </button>
 
             <button
               onClick={() =>
-                handleQuickAction("What are best Party wear tops?")
+                handleQuickAction("What are Collection snowboard?")
               }
               className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
               style={{
@@ -190,11 +190,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               type="button"
             >
               <Store className="w-3.5 h-3.5" />
-              <span>Party wear tops?</span>
+              <span>Collection snowboard?</span>
             </button>
 
             <button
-              onClick={() => handleQuickAction("Show me Handcrafted suit?")}
+              onClick={() =>
+                handleQuickAction("Show me Videographer snowboard?")
+              }
               className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
               style={{
                 backgroundColor: theme.inputButtonBg,
@@ -203,7 +205,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               type="button"
             >
               <Hand className="w-3.5 h-3.5" />
-              <span>Handcrafted suit ?</span>
+              <span>Videographer snowboard?</span>
             </button>
           </div>
         )}
@@ -212,9 +214,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       <form
         ref={formRef}
         onSubmit={onSubmit}
-        className={`flex items-center gap-2 rounded-full border px-4 py-2 relative ${
-          addresses.length === 0 ? "opacity-50 pointer-events-none" : ""
-        }`}
+        className={`flex items-center gap-2 rounded-full border px-4 py-2 relative `}
         style={{
           backgroundColor: theme.cardBg,
           borderColor: theme.border,
@@ -227,7 +227,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           placeholder={isSpeechEnabled ? "Listening..." : "Ask here..."}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          disabled={addresses.length === 0}
           className="flex-1 bg-transparent focus:outline-none text-[16px] min-h-[40px] transition-colors duration-300"
           style={{
             color: theme.text,
@@ -259,7 +258,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             type="button"
             onClick={toggleImageOptions}
             className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
-            disabled={addresses.length === 0}
           >
             <ImageIcon className="w-5 h-5" />
           </button>
@@ -316,7 +314,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             type="file"
             accept="image/*"
             onChange={handleImageUpload}
-            disabled={addresses.length === 0}
             className="hidden"
           />
 
@@ -327,16 +324,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             accept="image/*"
             capture="environment"
             onChange={handleImageUpload}
-            disabled={addresses.length === 0}
             className="hidden"
           />
         </div>
 
-        <button
-          type="submit"
-          className="p-1 text-gray-400 hover:text-gray-600"
-          disabled={addresses.length === 0}
-        >
+        <button type="submit" className="p-1 text-gray-400 hover:text-gray-600">
           <Send className="w-5 h-5" />
         </button>
       </form>
