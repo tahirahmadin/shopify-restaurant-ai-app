@@ -14,13 +14,11 @@ export const MenuList: React.FC<MenuListProps> = ({ items }) => {
   const { state } = useChatContext();
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 w-full">
       {/* Scrollable container with dynamic width */}
-      <div className="overflow-x-auto w-[250px]">
+      <div className="overflow-x-auto">
         {/* Flex container that takes exact width of menu items */}
         <div className="flex items-center gap-1 w-max">
-          {console.log("items")}
-          {console.log(items)}
           {items.map((meal) => (
             <ChatMenuItem
               key={meal.variantId}
@@ -28,6 +26,7 @@ export const MenuList: React.FC<MenuListProps> = ({ items }) => {
               name={meal.title}
               description={meal.body_html}
               price={meal.variantPrice}
+              variants={meal.variants}
               image={
                 meal?.images != ""
                   ? meal.images

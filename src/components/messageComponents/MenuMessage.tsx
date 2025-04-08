@@ -99,26 +99,7 @@ export const MenuMessage: React.FC<MenuMessageProps> = ({
 
       {message.items?.length > 0 && (
         <>
-          {/* {!restaurantState.cashMode && (
-            <div className="flex items-center gap-2 mt-2">
-              <button
-                onClick={() =>
-                  message.llm?.restroIds?.[0] &&
-                  handleSelectRestro(message.llm.restroIds[0])
-                }
-                className="flex items-center gap-1.5 bg-blue-500 px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors text-white"
-              >
-                <span>
-                  {menuUtils.getRestaurantNameById(
-                    restaurantState.restaurants,
-                    message.llm?.restroIds?.[0] || 0
-                  )}
-                </span>
-              </button>
-            </div>
-          )} */}
-
-          <div className="mt-2 pl-3 flex items-center gap-2 relative">
+          <div className="mt-2 pl-3 flex items-center gap-2 relative w-full">
             <MenuList messageId={message.id} items={message.items} />
           </div>
         </>

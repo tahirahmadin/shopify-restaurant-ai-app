@@ -9,8 +9,63 @@ import { CustomizationModal } from "./CustumizationModal";
 import { AddressModal } from "./AddressModal";
 import { FiltersProvider } from "../context/FiltersContext";
 import Testing from "./Testing";
+import { VariantDrawer } from "./VariantDrawer";
+import { useChatContext } from "../context/ChatContext";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
+const MainContent = () => {
+  const { state, dispatch } = useChatContext();
+
+  const handleVariantSelect = (variant: {
+    id: number;
+    name: string;
+    price: string;
+    image?: string;
+  }) => {
+    dispatch({
+      type: "ADD_TO_CART",
+      payload: {
+        id: variant.id,
+        name: variant.name,
+        price: variant.price,
+        quantity: 1,
+        restaurant: state.selectedRestaurant || "",
+        image: variant.image,
+      },
+    });
+
+    dispatch({
+      type: "SET_VARIANT_SELECTION",
+      payload: {
+        isOpen: false,
+        item: null,
+      },
+    });
+  };
+
+  return (
+    <>
+      <DunkinOrderApp />
+      <CustomizationModal />
+      <AddressModal />
+      <VariantDrawer
+        isOpen={state.variantSelection.isOpen}
+        onClose={() =>
+          dispatch({
+            type: "SET_VARIANT_SELECTION",
+            payload: {
+              isOpen: false,
+              item: null,
+            },
+          })
+        }
+        item={state.variantSelection.item}
+        onSelectVariant={handleVariantSelect}
+      />
+    </>
+  );
+};
 
 export const FoodOrderBot = () => {
   return (
@@ -27,12 +82,7 @@ export const FoodOrderBot = () => {
             <RestaurantProvider>
               <FiltersProvider>
                 <ChatProvider>
-                  <>
-                    {/* <Testing /> */}
-                    <DunkinOrderApp />
-                    <CustomizationModal />
-                    <AddressModal />
-                  </>
+                  <MainContent />
                 </ChatProvider>
               </FiltersProvider>
             </RestaurantProvider>

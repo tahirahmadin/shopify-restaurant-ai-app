@@ -83,6 +83,21 @@ interface ChatState {
       cvv: string;
     };
   };
+  variantSelection: {
+    isOpen: boolean;
+    item: {
+      id: number;
+      name: string;
+      price: string;
+      image?: string;
+      variants: Array<{
+        id: number;
+        name: string;
+        price: string;
+        image?: string;
+      }>;
+    } | null;
+  };
 }
 
 export interface CartItem {
@@ -124,7 +139,8 @@ type ChatAction =
       payload: Partial<ChatState["checkout"]["orderDetails"]>;
     }
   | { type: "CLEAR_CART" }
-  | { type: "RESET_STATE" };
+  | { type: "RESET_STATE" }
+  | { type: "SET_VARIANT_SELECTION"; payload: ChatState["variantSelection"] };
 
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
@@ -239,6 +255,11 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         messages: [state.messages[0]], // Keep only the welcome message
         selectedRestaurant: null,
       };
+    case "SET_VARIANT_SELECTION":
+      return {
+        ...state,
+        variantSelection: action.payload,
+      };
     default:
       return state;
   }
@@ -268,6 +289,10 @@ const initialState: ChatState = {
       expiryDate: "",
       cvv: "",
     },
+  },
+  variantSelection: {
+    isOpen: false,
+    item: null,
   },
 };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, Minus, Info } from "lucide-react";
+import { Plus, Minus, Info, X, List } from "lucide-react";
 import { useChatContext } from "../context/ChatContext";
 import { CartChangeModal } from "./CartChangeModal";
 import { DishDetailsModal } from "./DishDetailsModal";
@@ -18,13 +18,136 @@ interface MenuItemProps {
   restaurant?: string;
   isCustomisable?: boolean;
   customisation?: MenuItemFront["customisation"];
+  description?: string;
+  variants?: Array<{
+    id: number;
+    name: string;
+    price: string;
+    image?: string;
+  }>;
 }
+
+interface VariantDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  variants: Array<{
+    id: number;
+    name: string;
+    price: string;
+    image?: string;
+  }>;
+  onSelectVariant: (variant: {
+    id: number;
+    name: string;
+    price: string;
+    image?: string;
+  }) => void;
+}
+
+const VariantDrawer: React.FC<VariantDrawerProps> = ({
+  isOpen,
+  onClose,
+  variants,
+  onSelectVariant,
+}) => {
+  const { theme } = useFiltersContext();
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-end justify-center">
+      <div className="bg-white w-full h-[90vh] rounded-t-3xl overflow-hidden">
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-white border-b px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-800">
+                Select Variant
+              </h2>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="overflow-y-auto h-full">
+          {/* Product Image */}
+          <div className="relative h-48 w-full">
+            <img
+              src={variants[0]?.image || "https://via.placeholder.com/400"}
+              alt={variants[0]?.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* Product Details */}
+          <div className="p-4 space-y-4">
+            <div>
+              <h3 className="text-xl font-semibold text-gray-800">
+                {variants[0]?.name}
+              </h3>
+              <p className="text-lg font-bold text-primary mt-1">
+                {variants[0]?.price} AED
+              </p>
+            </div>
+
+            {/* Variants Section */}
+            <div className="space-y-3">
+              <h4 className="text-base font-medium text-gray-800">
+                Available Variants
+              </h4>
+              <div className="space-y-3">
+                {variants.map((variant) => (
+                  <button
+                    key={variant.id}
+                    onClick={() => onSelectVariant(variant)}
+                    className="w-full p-4 rounded-xl border flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    style={{
+                      borderColor: theme.border,
+                      color: theme.modalMainText,
+                    }}
+                  >
+                    <div className="flex items-center gap-4">
+                      {variant.image && (
+                        <img
+                          src={variant.image}
+                          alt={variant.name}
+                          className="w-16 h-16 object-cover rounded-lg"
+                        />
+                      )}
+                      <div className="text-left">
+                        <h4 className="font-medium">{variant.name}</h4>
+                        <p className="text-sm opacity-70">
+                          {variant.price} AED
+                        </p>
+                      </div>
+                    </div>
+                    <Plus
+                      className="w-6 h-6"
+                      style={{ color: theme.primary }}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const ChatMenuItem: React.FC<MenuItemProps> = ({
   id,
   name,
   description,
   price,
+  variants,
   restroId,
   restaurant,
   image,
@@ -36,11 +159,10 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
   const [isCartChangeModalOpen, setIsCartChangeModalOpen] =
     React.useState(false);
   const [restaurantName, setRestaurantName] = React.useState("");
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = React.useState(false);
   const { theme } = useFiltersContext();
+
   // Check if item is in cart
   const cartItem = state.cart.find((item) => {
-    // console.log(item);
     return item.id === id && restaurantName === state.cart[0]?.restaurant;
   });
   const isInCart = Boolean(cartItem);
@@ -52,45 +174,6 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
       restroId
     );
     setRestaurantName(name);
-
-    const messageHandler = (event) => {
-      const { type, payload } = event.data;
-
-      if (type === "CART_SUCCESS") {
-        console.log("✅ Item added to cart:", payload);
-        // Optional: show toast or animation
-        document.dispatchEvent(new Event("cart:refresh"));
-      }
-
-      if (type === "CART_UPDATED") {
-        console.log("🟢 Parent confirmed cart update:", payload);
-
-        // Dispatch native Shopify cart events
-        document.dispatchEvent(new Event("shopify:cart:updated"));
-        document.dispatchEvent(new CustomEvent("cart:refresh"));
-
-        // Optional: you can call Shopify's cart drawer refresh if needed
-        if (
-          window.Shopify &&
-          Shopify.theme &&
-          Shopify.theme.cartDrawer &&
-          typeof Shopify.theme.cartDrawer.fetchCart === "function"
-        ) {
-          Shopify.theme.cartDrawer.fetchCart();
-        }
-      }
-
-      if (type === "CART_ERROR") {
-        console.error("❌ Failed to add item:", payload);
-        // Show error to user if needed
-      }
-    };
-
-    window.addEventListener("message", messageHandler);
-
-    return () => {
-      window.removeEventListener("message", messageHandler);
-    };
   }, [restroId, restaurantState.restaurants]);
 
   const handleCartAction = () => {
@@ -106,6 +189,23 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
 
     if (cartRestaurant && cartRestaurant !== restaurantName) {
       setIsCartChangeModalOpen(true);
+      return;
+    }
+
+    if (variants && variants.length > 1) {
+      dispatch({
+        type: "SET_VARIANT_SELECTION",
+        payload: {
+          isOpen: true,
+          item: {
+            id,
+            name,
+            price,
+            image,
+            variants,
+          },
+        },
+      });
       return;
     }
 
@@ -144,7 +244,7 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
       {
         type: "ADD_TO_CART",
         payload: {
-          id: id, // Shopify numeric variant ID
+          id: id,
           quantity: 1,
         },
       },
@@ -172,8 +272,9 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
   const handleCloseModal = () => {
     setIsCartChangeModalOpen(false);
   };
+
   return (
-    <div className="rounded-lg shadow-sm overflow-hidden flex flex-col w-[80px]">
+    <div className="rounded-lg shadow-sm overflow-hidden flex flex-col w-[120px]">
       <div
         style={{
           backgroundColor: theme.menuItemBg,
@@ -181,13 +282,12 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
       >
         <div className="w-full relative">
           <img
-            onClick={() => setIsDetailsModalOpen(true)}
             src={
               image ||
               "https://i.pinimg.com/originals/da/4f/c2/da4fc2360e1dcc5c85cf5eeaee4b107f.gif"
             }
             alt={name}
-            className="w-full h-[55px] object-cover"
+            className="w-full h-[75px] object-cover"
           />
 
           <button
@@ -200,6 +300,8 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
           >
             {isInCart ? (
               <Minus className="w-3 h-3" />
+            ) : variants && variants.length > 1 ? (
+              <List className="w-3 h-3" />
             ) : (
               <Plus className="w-3 h-3" />
             )}
@@ -230,23 +332,6 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
         onConfirm={handleCartChange}
         currentRestaurant={state.cart[0]?.restaurant || ""}
         newRestaurant={restaurantName}
-      />
-      <DishDetailsModal
-        isOpen={isDetailsModalOpen}
-        onClose={() => {
-          console.log("hitting");
-          setIsDetailsModalOpen(false);
-          return true;
-        }}
-        id={id}
-        name={name}
-        description={description}
-        price={price}
-        image={image}
-        restroId={restroId}
-        restaurant={restaurant}
-        isCustomisable={isCustomisable}
-        customisation={customisation}
       />
     </div>
   );
