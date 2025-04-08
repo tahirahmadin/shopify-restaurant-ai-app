@@ -4,7 +4,6 @@ import {
   getProductsByIds,
 } from "../../actions/serverActions";
 import { getMenuByRestaurantId } from "../../utils/menuUtils";
-import { filterRestaurantsByDistance } from "../../utils/distanceUtils";
 import { genAIResponse } from "../../actions/aiActions";
 
 interface RecommendedItem {

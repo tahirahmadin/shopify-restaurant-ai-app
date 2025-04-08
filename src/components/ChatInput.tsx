@@ -205,7 +205,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               type="button"
             >
               <Hand className="w-3.5 h-3.5" />
-              <span>Videographer snowboard?</span>
+              <span>Videographer board?</span>
             </button>
           </div>
         )}

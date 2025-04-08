@@ -201,13 +201,13 @@ export const getRestaurantMenu = async (
   restaurantId: number
 ): Promise<MenuItem[]> => {
   try {
-    const response = await axios.get(
-      `https://aggregator.gobbl.ai/api/shopify/getProducts?accessToken=${accessToken}`
-    );
+    // const response = await axios.get(
+    //   `https://aggregator.gobbl.ai/api/shopify/getProducts?accessToken=${accessToken}`
+    // );
 
-    if (response.data && response.data.result) {
-      return response.data.result;
-    }
+    // if (response.data && response.data.result) {
+    //   return response.data.result;
+    // }
     return [];
   } catch (error) {
     console.error(`Error fetching menu for restaurant ${restaurantId}:`, error);
