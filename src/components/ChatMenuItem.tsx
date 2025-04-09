@@ -274,12 +274,15 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
   };
 
   return (
-    <div className="rounded-lg shadow-sm overflow-hidden flex flex-col w-[120px]">
-      <div
-        style={{
-          backgroundColor: theme.menuItemBg,
-        }}
-      >
+    <div
+      className="rounded-lg shadow-sm overflow-hidden flex flex-col w-[130px]"
+      style={{
+        backgroundColor: "#eeeeee",
+        border: "2px solid #eeeeee",
+        borderRadius: "8px",
+      }}
+    >
+      <div>
         <div className="w-full relative">
           <img
             src={
@@ -287,7 +290,8 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
               "https://i.pinimg.com/originals/da/4f/c2/da4fc2360e1dcc5c85cf5eeaee4b107f.gif"
             }
             alt={name}
-            className="w-full h-[75px] object-cover"
+            className="w-full h-[90px] object-contain"
+            style={{ backgroundColor: "white" }}
           />
 
           <button
@@ -299,11 +303,11 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
             }}
           >
             {isInCart ? (
-              <Minus className="w-3 h-3" />
+              <Minus className="w-4 h-4" />
             ) : variants && variants.length > 1 ? (
-              <List className="w-3 h-3" />
+              <List className="w-4 h-4" />
             ) : (
-              <Plus className="w-3 h-3" />
+              <Plus className="w-4 h-4" />
             )}
           </button>
         </div>
@@ -311,7 +315,7 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
         {/* Content Container */}
         <div className="relative p-1.5 flex flex-col">
           <h3
-            className="text-[9px] font-medium text-gray-800 line-clamp-2 min-h-[1.5rem]"
+            className="text-[11px] font-medium text-gray-800 line-clamp-2 min-h-[1.5rem]"
             style={{
               color: theme.menuItemText,
             }}
@@ -319,7 +323,7 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
             {name}
           </h3>
           <p
-            className="font-bold text-[8px]"
+            className="font-medium text-[12px]"
             style={{ color: theme.menuItemPrice }}
           >
             {price} AED

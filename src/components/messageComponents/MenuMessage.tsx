@@ -79,7 +79,7 @@ export const MenuMessage: React.FC<MenuMessageProps> = ({
             className="w-8 h-8 rounded-full object-cover border-2 border-secondary mr-2"
           />
         )}
-        <div className="text-[13px]">{message.text}</div>
+        <div className="text-[14px]">{message.text}</div>
       </div>
     );
   }
@@ -92,7 +92,7 @@ export const MenuMessage: React.FC<MenuMessageProps> = ({
           alt={selectedStyle.name}
           className="w-8 h-8 rounded-full object-cover border-2 border-secondary"
         />
-        <p className="text-[13px] pl-2" style={{ color: theme.text }}>
+        <p className="text-[14px] pl-2" style={{ color: theme.text }}>
           {message.text}
         </p>
       </div>

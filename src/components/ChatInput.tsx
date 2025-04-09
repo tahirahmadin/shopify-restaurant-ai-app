@@ -30,8 +30,7 @@ interface ChatInputProps {
   interimTranscript?: string;
 }
 import { useFiltersContext } from "../context/FiltersContext";
-import { genAIResponse } from "../actions/aiActions";
-import { generateLLMResponse } from "../actions/serverActions";
+import { useRestaurant } from "../context/RestaurantContext";
 
 export const ChatInput: React.FC<ChatInputProps> = ({
   input,
@@ -49,6 +48,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 }) => {
   const { addresses } = useAuth();
   const { theme } = useFiltersContext();
+  const { state: restaurantState } = useRestaurant();
+
   const formRef = useRef<HTMLFormElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -150,63 +151,23 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       <div className="w-full">
         {showQuickActions && !input && !isKeyboardOpen && (
           <div className="grid grid-cols-2 gap-2 mb-1 max-h-[120px] overflow-y-auto">
-            <button
-              onClick={() =>
-                handleQuickAction("Show me Cheap Snowboard available")
-              }
-              className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
-              style={{
-                backgroundColor: theme.inputButtonBg,
-                color: theme.inputButtonText,
-              }}
-              type="button"
-            >
-              <Store className="w-3.5 h-3.5" />
-              <span>Cheap Snowboard ?</span>
-            </button>
-
-            <button
-              onClick={() => handleQuickAction("Show me Ski Wax")}
-              className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
-              style={{
-                backgroundColor: theme.inputButtonBg,
-                color: theme.inputButtonText,
-              }}
-              type="button"
-            >
-              <Store className="w-3.5 h-3.5" />
-              <span>Ski Wax ?</span>
-            </button>
-
-            <button
-              onClick={() =>
-                handleQuickAction("What are Collection snowboard?")
-              }
-              className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
-              style={{
-                backgroundColor: theme.inputButtonBg,
-                color: theme.inputButtonText,
-              }}
-              type="button"
-            >
-              <Store className="w-3.5 h-3.5" />
-              <span>Collection snowboard?</span>
-            </button>
-
-            <button
-              onClick={() =>
-                handleQuickAction("Show me Videographer snowboard?")
-              }
-              className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
-              style={{
-                backgroundColor: theme.inputButtonBg,
-                color: theme.inputButtonText,
-              }}
-              type="button"
-            >
-              <Hand className="w-3.5 h-3.5" />
-              <span>Videographer board?</span>
-            </button>
+            {restaurantState.storeConfig?.cues.map((singleCue, index) => {
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleQuickAction(singleCue.value)}
+                  className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
+                  style={{
+                    backgroundColor: theme.inputButtonBg,
+                    color: theme.inputButtonText,
+                  }}
+                  type="button"
+                >
+                  <Store className="w-3.5 h-3.5" />
+                  <span>{singleCue.title}</span>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>

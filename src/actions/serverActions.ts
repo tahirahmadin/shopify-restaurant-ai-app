@@ -159,7 +159,7 @@ export const getStoreConfigData = async (
 ): Promise<any | null> => {
   try {
     const response = await axios.get(
-      `https://aggregator.gobbl.ai/api/shopify/getStoreData?sellerId=${sellerId}`
+      `https://aggregator.gobbl.ai/api/shopify/getSellerData?sellerId=${sellerId}`
     );
 
     if (response.data && response.data.result) {

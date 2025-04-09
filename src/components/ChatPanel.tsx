@@ -293,8 +293,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
       "Fetching recommendations...",
       "Exploring hidden gems...",
     ];
+    let loaderContent = restaurantState.storeConfig?.loaderTexts || content;
 
-    return content[Math.floor(Math.random() * content.length)];
+    return loaderContent[Math.floor(Math.random() * loaderContent.length)];
   };
 
   // Use either external or internal image analyzing state

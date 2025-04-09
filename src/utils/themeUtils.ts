@@ -1,3 +1,5 @@
+import { useRestaurant } from "../context/RestaurantContext";
+
 export interface Theme {
   // Base colors
   primary: string;
@@ -73,6 +75,8 @@ export interface Theme {
 }
 
 export const getThemeForStyle = (styleName: string): Theme => {
+  const { state: restaurantState } = useRestaurant();
+
   switch (styleName) {
     case "CZ Binance":
       return {
@@ -298,7 +302,7 @@ export const getThemeForStyle = (styleName: string): Theme => {
     default: // Gobbl default theme
       return {
         // Base colors
-        primary: "#7556DF",
+        primary: restaurantState.storeConfig?.theme,
         secondary: "#FFF5F2",
         background: "#FFF8F5",
         text: "#1A1A1A",
@@ -307,14 +311,14 @@ export const getThemeForStyle = (styleName: string): Theme => {
         // Header specific
         headerBg: "#ffffff",
         headerText: "#1A1A1A",
-        headerIconColor: "#7556DF",
-        headerHighlight: "#7556DF",
+        headerIconColor: restaurantState.storeConfig?.theme,
+        headerHighlight: restaurantState.storeConfig?.theme,
         headerBorder: "#FFE5E5",
 
         // Filters section
         filtersBg: "#FFFFFF",
         filtersText: "#1A1A1A",
-        filtersIconColor: "#7556DF",
+        filtersIconColor: restaurantState.storeConfig?.theme,
         filtersBorder: "#E5E5E5",
         filtersButtonBg: "#F5F5F5",
         filtersButtonText: "#1A1A1A",
@@ -323,7 +327,7 @@ export const getThemeForStyle = (styleName: string): Theme => {
         // Chat panel
         chatBg: "#FFF8F5",
         chatText: "#1A1A1A",
-        chatBubbleBg: "#7556DF",
+        chatBubbleBg: restaurantState.storeConfig?.theme,
         chatBubbleText: "#FFFFFF",
         chatBubbleBotBg: "#FFF5F2",
         chatBubbleBotText: "#1A1A1A",
@@ -331,15 +335,15 @@ export const getThemeForStyle = (styleName: string): Theme => {
         // Menu item
         menuItemBg: "#F9FAFB", // Dark background (Kitchen ambiance)
         menuItemText: "#000000", // Light text for contrast
-        menuItemPrice: "#7556DF", // Gold (Michelin-star premium quality)
+        menuItemPrice: restaurantState.storeConfig?.theme, // Gold (Michelin-star premium quality)
 
         // Input panel
         inputBg: "#FFFFFF",
         inputText: "#1A1A1A",
         inputPlaceholder: "#757575",
         inputBorder: "#E5E5E5",
-        inputIconColor: "#7556DF",
-        inputButtonBg: "#7556DF",
+        inputIconColor: restaurantState.storeConfig?.theme,
+        inputButtonBg: restaurantState.storeConfig?.theme,
         inputButtonText: "#FFFFFF",
 
         // Quick actions
@@ -352,7 +356,7 @@ export const getThemeForStyle = (styleName: string): Theme => {
         cardBg: "#FFFFFF",
         cardText: "#1A1A1A",
         cardBorder: "#E5E5E5",
-        cardHighlight: "#7556DF",
+        cardHighlight: restaurantState.storeConfig?.theme,
 
         modalBg: "#FFF5F2", // Light warm background for a soft feel
         modalBgLight: "#FFE5E0", // Softer peach tone to maintain harmony

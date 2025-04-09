@@ -8,7 +8,7 @@ import { useAuth } from "./AuthContext";
 
 interface RestaurantState {
   selectedRestroIds: number[];
-  activeRestroId: number | null;
+  activeRestroId: string | null;
   singleMode: boolean;
   cashMode: boolean;
   backgroundImage: string | null;
@@ -17,11 +17,11 @@ interface RestaurantState {
     [key: string]: any[];
   };
   storeConfig: {
-    title: string;
-    logo: string;
+    botTitle: string;
+    image: string;
     cues: any[];
-    themeColor: string;
-    loaders: any[];
+    theme: string;
+    loaderTexts: any[];
   } | null;
 }
 
@@ -60,12 +60,6 @@ const restaurantReducer = (
   action: RestaurantAction
 ): RestaurantState => {
   switch (action.type) {
-    case "SET_RESTRO_IDS":
-      return {
-        ...state,
-        selectedRestroIds: action.payload,
-        activeRestroId: null, // Reset active ID when setting multiple IDs
-      };
     case "SET_ACTIVE_RESTRO":
       return {
         ...state,
@@ -76,11 +70,7 @@ const restaurantReducer = (
         ...state,
         backgroundImage: action.payload,
       };
-    case "SET_RESTAURANTS":
-      return {
-        ...state,
-        restaurants: action.payload,
-      };
+
     case "SET_MENU":
       return {
         ...state,
@@ -94,12 +84,7 @@ const restaurantReducer = (
         ...state,
         storeConfig: action.payload,
       };
-    case "CLEAR_RESTRO_IDS":
-      return {
-        ...state,
-        selectedRestroIds: [],
-        activeRestroId: null,
-      };
+
     case "RESET_STATE":
       return {
         ...state,
@@ -119,37 +104,18 @@ const RestaurantContext = createContext<{
 const RestaurantProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { addresses, isAuthenticated } = useAuth();
   const [state, dispatch] = useReducer(restaurantReducer, initialState);
-
-  useEffect(() => {
-    const fetchRestaurants = async () => {
-      // Get coordinates from the selected (first) address
-      const selectedAddress = addresses[0];
-      const coordinates = selectedAddress?.coordinates;
-
-      if (coordinates) {
-        // Fetch restaurants based on coordinates.
-        // Adjust the second parameter (limit) as needed.
-        const restaurantData = await getAllRestaurants(coordinates, 3);
-        dispatch({ type: "SET_RESTAURANTS", payload: restaurantData });
-      }
-    };
-
-    // If the user is authenticated and a valid address with coordinates exists, fetch restaurants.
-    if (isAuthenticated && addresses.length > 0 && addresses[0]?.coordinates) {
-      fetchRestaurants();
-    }
-  }, [isAuthenticated, addresses, dispatch]);
 
   // Fetch store config on mount
   useEffect(() => {
     const fetchStoreConfig = async () => {
       try {
-        const sellerId = "67f4c66264c8ebedac3b46a9"; // This should be dynamic based on your app's needs
-        const storeConfig = await getStoreConfigData(sellerId);
-        if (storeConfig) {
-          dispatch({ type: "SET_STORE_CONFIG", payload: storeConfig });
+        if (state.activeRestroId) {
+          const sellerId = state.activeRestroId;
+          const storeConfig = await getStoreConfigData(sellerId);
+          if (storeConfig) {
+            dispatch({ type: "SET_STORE_CONFIG", payload: storeConfig });
+          }
         }
       } catch (error) {
         console.error("Error fetching store config:", error);
@@ -157,7 +123,7 @@ const RestaurantProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     fetchStoreConfig();
-  }, [dispatch]);
+  }, [dispatch, state.activeRestroId]);
 
   return (
     <RestaurantContext.Provider value={{ state, dispatch }}>
@@ -173,13 +139,6 @@ function useRestaurant() {
   }
 
   const { state, dispatch } = context;
-  const { addresses } = useAuth();
-
-  const setRestaurants = (ids: number[]) => {
-    if (JSON.stringify(state.selectedRestroIds) !== JSON.stringify(ids)) {
-      dispatch({ type: "SET_RESTRO_IDS", payload: ids });
-    }
-  };
 
   const setActiveRestaurant = (id: number | null) => {
     if (state.activeRestroId !== id) {
@@ -187,35 +146,10 @@ function useRestaurant() {
     }
   };
 
-  const clearRestaurants = () => {
-    dispatch({ type: "CLEAR_RESTRO_IDS" });
-  };
-
-  const setRestaurantList = (restaurants: SingleRestro[]) => {
-    dispatch({ type: "SET_RESTAURANTS", payload: restaurants });
-  };
-
-  const refreshRestaurants = async () => {
-    try {
-      const selectedAddress = addresses[0];
-      const coordinates = selectedAddress?.coordinates;
-      if (coordinates) {
-        const restaurantData = await getAllRestaurants(coordinates);
-        dispatch({ type: "SET_RESTAURANTS", payload: restaurantData });
-      }
-    } catch (error) {
-      console.error("Error refreshing restaurants:", error);
-    }
-  };
-
   const value = {
     state,
     dispatch,
-    setRestaurants,
     setActiveRestaurant,
-    clearRestaurants,
-    setRestaurantList,
-    refreshRestaurants,
   };
 
   return value;
