@@ -153,6 +153,25 @@ interface ApiResponse<T> {
 
 // *************** RESTAURANT APIS **************************
 
+// Get store config data
+export const getStoreConfigData = async (
+  sellerId: string
+): Promise<any | null> => {
+  try {
+    const response = await axios.get(
+      `https://aggregator.gobbl.ai/api/shopify/getStoreData?sellerId=${sellerId}`
+    );
+
+    if (response.data && response.data.result) {
+      return response.data.result;
+    }
+    return [];
+  } catch (error) {
+    console.error(`Error fetching store data for ${sellerId}:`, error);
+    return [];
+  }
+};
+
 // Get all online restaurants
 export const getAllRestaurants = async (
   coordinates?: { lat: number; lng: number } | null,

@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useRef, useState } from "react";
 import { useEffect } from "react";
 import {
-  loginUserFromBackendServer,
   getUserDetails,
   getUserOrders,
   updateUserAddresses,

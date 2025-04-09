@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useReducer, useEffect } from "react";
-import { getAllRestaurants } from "../actions/serverActions";
+import {
+  getAllRestaurants,
+  getStoreConfigData,
+} from "../actions/serverActions";
 import { SingleRestro } from "../types/menu";
 import { useAuth } from "./AuthContext";
 
@@ -13,6 +16,13 @@ interface RestaurantState {
   menus: {
     [key: string]: any[];
   };
+  storeConfig: {
+    title: string;
+    logo: string;
+    cues: any[];
+    themeColor: string;
+    loaders: any[];
+  } | null;
 }
 
 type RestaurantAction =
@@ -22,7 +32,17 @@ type RestaurantAction =
   | { type: "CLEAR_RESTRO_IDS" }
   | { type: "SET_RESTAURANTS"; payload: SingleRestro[] }
   | { type: "SET_MENU"; payload: { restaurantId: string; menu: any[] } }
-  | { type: "RESET_STATE" };
+  | { type: "RESET_STATE" }
+  | {
+      type: "SET_STORE_CONFIG";
+      payload: {
+        title: string;
+        logo: string;
+        cues: any[];
+        themeColor: string;
+        loaders: any[];
+      };
+    };
 
 const initialState: RestaurantState = {
   selectedRestroIds: [],
@@ -32,6 +52,7 @@ const initialState: RestaurantState = {
   activeRestroId: null,
   restaurants: [],
   menus: {},
+  storeConfig: null,
 };
 
 const restaurantReducer = (
@@ -67,6 +88,11 @@ const restaurantReducer = (
           ...state.menus,
           [action.payload.restaurantId]: action.payload.menu,
         },
+      };
+    case "SET_STORE_CONFIG":
+      return {
+        ...state,
+        storeConfig: action.payload,
       };
     case "CLEAR_RESTRO_IDS":
       return {
@@ -115,6 +141,23 @@ const RestaurantProvider: React.FC<{ children: React.ReactNode }> = ({
       fetchRestaurants();
     }
   }, [isAuthenticated, addresses, dispatch]);
+
+  // Fetch store config on mount
+  useEffect(() => {
+    const fetchStoreConfig = async () => {
+      try {
+        const sellerId = "67f4c66264c8ebedac3b46a9"; // This should be dynamic based on your app's needs
+        const storeConfig = await getStoreConfigData(sellerId);
+        if (storeConfig) {
+          dispatch({ type: "SET_STORE_CONFIG", payload: storeConfig });
+        }
+      } catch (error) {
+        console.error("Error fetching store config:", error);
+      }
+    };
+
+    fetchStoreConfig();
+  }, [dispatch]);
 
   return (
     <RestaurantContext.Provider value={{ state, dispatch }}>

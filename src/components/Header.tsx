@@ -229,7 +229,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenPanel, onCartClick }) => {
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      {/* <div className="flex items-center gap-2">
         <div
           className="flex items-center gap-2"
           onClick={onOpenPanel}
@@ -240,7 +240,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenPanel, onCartClick }) => {
           </span>{" "}
           <ShoppingBag />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
