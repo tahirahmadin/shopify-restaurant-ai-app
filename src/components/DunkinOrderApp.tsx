@@ -54,8 +54,8 @@ export const DunkinOrderApp: React.FC = () => {
     const backImageUrl =
       "https://www.curatehome.me/cdn/shop/files/5_300x.png?v=1684928640";
 
-    // const sellerId = sellerIdParam;
-    const sellerId = "67f4c66264c8ebedac3b46a9";
+    const sellerId = sellerIdParam;
+    // const sellerId = "67f4c66264c8ebedac3b46a9";
 
     if (sellerId && restaurantState.singleMode) {
       console.log("Seller ID:", sellerId);
@@ -213,10 +213,7 @@ export const DunkinOrderApp: React.FC = () => {
       const transcript = result.transcript.trim();
       if (!transcript) return;
 
-      const queryType = chatLogic.determineQueryType(
-        transcript,
-        restaurantState.activeRestroId
-      );
+      const queryType = chatLogic.determineQueryType(transcript);
       // Dispatch the spoken message as a user message.
       const userMessage = {
         id: Date.now(),
