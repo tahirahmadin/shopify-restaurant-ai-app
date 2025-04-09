@@ -7,6 +7,7 @@ import { TypingEffect } from "./messageComponents/TypingEffect";
 import { MenuMessage } from "./messageComponents/MenuMessage";
 import { OrderMessage } from "./messageComponents/OrderMessage";
 import { RestaurantMessage } from "./messageComponents/RestaurantMessage";
+import { useRestaurant } from "../context/RestaurantContext";
 
 interface MessageProps {
   message: MessageType;
@@ -15,6 +16,7 @@ interface MessageProps {
 
 export const Message: React.FC<MessageProps> = ({ message, onRetry }) => {
   const { state } = useChatContext();
+  const { state: restaurantState } = useRestaurant();
   const { selectedStyle, theme } = useFiltersContext();
   const [isLoading, setIsLoading] = useState(true);
   const [showTypingEffect, setShowTypingEffect] = useState(false);
@@ -84,7 +86,9 @@ export const Message: React.FC<MessageProps> = ({ message, onRetry }) => {
             : "text-white"
         }`}
         style={{
-          backgroundColor: message.isBot ? `${theme.cardBg}` : theme.primary,
+          backgroundColor: message.isBot
+            ? `${theme.cardBg}`
+            : restaurantState.storeConfig?.theme,
           color: message.isBot ? theme.text : "#FFFFFF",
           transition: "all 0.3s ease",
         }}

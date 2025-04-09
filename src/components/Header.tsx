@@ -16,7 +16,7 @@ export const Header: React.FC<HeaderProps> = () => {
     <div
       className="px-4 py-3 border-b flex items-center justify-between transition-colors duration-300"
       style={{
-        backgroundColor: restaurantState.storeConfig?.theme,
+        backgroundColor: restaurantState.storeConfig?.theme || "#000000",
         borderColor: theme.border,
       }}
     >

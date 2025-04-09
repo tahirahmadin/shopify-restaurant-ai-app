@@ -162,7 +162,7 @@ export const DunkinOrderApp: React.FC = () => {
       dispatch({ type: "SET_LOADING", payload: true });
 
       try {
-        await chatLogic.handleMenuQuery(state.messages, userMessage);
+        await chatLogic.handleMenuQuery([...state.messages], userMessage);
       } catch (error) {
         console.error("Error processing AI response:", error);
         dispatch({

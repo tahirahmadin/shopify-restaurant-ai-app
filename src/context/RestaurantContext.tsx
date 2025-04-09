@@ -1,10 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from "react";
-import {
-  getAllRestaurants,
-  getStoreConfigData,
-} from "../actions/serverActions";
+import { getStoreConfigData } from "../actions/serverActions";
 import { SingleRestro } from "../types/menu";
-import { useAuth } from "./AuthContext";
 
 interface RestaurantState {
   selectedRestroIds: number[];
@@ -52,7 +48,13 @@ const initialState: RestaurantState = {
   activeRestroId: null,
   restaurants: [],
   menus: {},
-  storeConfig: null,
+  storeConfig: {
+    botTitle: "Shopify Store",
+    image: "",
+    cues: [],
+    theme: "#000000",
+    loaderTexts: [],
+  },
 };
 
 const restaurantReducer = (
