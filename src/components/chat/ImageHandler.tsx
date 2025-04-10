@@ -12,12 +12,7 @@ interface ImageHandlerProps {
   orders: any[];
   setRestaurants: (ids: number[]) => void;
   getMenuItemsByFile: (restaurantId: number) => Promise<any[]>;
-  handleMenuQuery: (
-    queryType: QueryType,
-    userInput: string,
-    isImageBased?: boolean,
-    imageCaption?: string
-  ) => Promise<any>;
+  handleMenuQuery: (messages: any, userMessage: any) => Promise<any>;
 }
 
 export const useImageHandler = ({
@@ -37,17 +32,20 @@ export const useImageHandler = ({
   const handleImageUpload = async (
     file: File,
     setIsImageAnalyzing: (value: boolean) => void,
-    caption: string = "" 
+    caption: string = ""
   ) => {
     setIsImageAnalyzing(true);
     const imageUrl = URL.createObjectURL(file);
-    const messageText = caption.trim();
+    const messageText = caption.trim() || "Analyzing this image...";
 
-    dispatch({
-      type: "ADD_MESSAGE",
-      payload: {
+    try {
+      // Get the image analysis first
+      const imageDescription = await imageService.analyzeImage(file);
+      
+      // Create user message with the enhanced image description
+      const userMessage = {
         id: Date.now(),
-        text: messageText,
+        text: messageText || "Find products similar to what's in this image",
         isBot: false,
         time: new Date().toLocaleString("en-US", {
           hour: "numeric",
@@ -56,18 +54,22 @@ export const useImageHandler = ({
         }),
         imageUrl,
         queryType: QueryType.MENU_QUERY,
-      },
-    });
+        imageAnalysis: imageDescription 
+      };
 
-    try {
-      const imageDescription = await imageService.analyzeImage(file);
+      // Add the user message to state
+      dispatch({
+        type: "ADD_MESSAGE",
+        payload: userMessage,
+      });
       
-      await handleMenuQuery(
-        QueryType.MENU_QUERY,
-        imageDescription,
-        true,
-        caption.trim() 
-      );
+      // Call handleMenuQuery with the proper arguments
+      // We pass the user message with the image analysis included
+      await handleMenuQuery(state.messages, {
+        ...userMessage,
+        // Enhance the text with the image analysis for the prompt
+        text: `${userMessage.text} [Image analysis: ${imageDescription}]`
+      });
       
     } catch (error) {
       console.error("Error processing image:", error);
