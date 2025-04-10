@@ -54,8 +54,8 @@ export const DunkinOrderApp: React.FC = () => {
     const backImageUrl =
       "https://www.curatehome.me/cdn/shop/files/5_300x.png?v=1684928640";
 
-    // const sellerId = sellerIdParam;
-    const sellerId = "67f78035a81db033bf9f1040";
+    const sellerId = sellerIdParam;
+    // const sellerId = "67f78035a81db033bf9f1040";
 
     if (sellerId && restaurantState.singleMode) {
       console.log("Seller ID:", sellerId);
