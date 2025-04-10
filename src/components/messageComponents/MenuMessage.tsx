@@ -4,6 +4,7 @@ import { Message } from "../../types";
 import { MenuList } from "../MenuList";
 
 import { useFiltersContext } from "../../context/FiltersContext";
+import { useRestaurant } from "../../context/RestaurantContext";
 
 interface MenuMessageProps {
   message: Message;
@@ -15,6 +16,7 @@ export const MenuMessage: React.FC<MenuMessageProps> = ({
   selectedStyle,
 }) => {
   const { theme } = useFiltersContext();
+  const { state: restaurantState } = useRestaurant();
 
   if (message.queryType === "GENERAL") {
     return (

@@ -86,10 +86,8 @@ export const Message: React.FC<MessageProps> = ({ message, onRetry }) => {
             : "text-white"
         }`}
         style={{
-          backgroundColor: message.isBot
-            ? `${theme.cardBg}`
-            : restaurantState.storeConfig?.theme,
-          color: message.isBot ? theme.text : "#FFFFFF",
+          backgroundColor: message.isBot ? `${theme.cardBg}` : "#000000",
+          color: message.isBot ? theme.text : "#f9f9f9",
           transition: "all 0.3s ease",
         }}
       >

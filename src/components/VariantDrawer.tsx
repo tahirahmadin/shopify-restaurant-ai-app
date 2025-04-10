@@ -1,6 +1,7 @@
-import React from "react";
-import { X, Plus, ChevronRight } from "lucide-react";
+import React, { useState } from "react";
+import { X, Plus, ChevronRight, ShoppingCart } from "lucide-react";
 import { useFiltersContext } from "../context/FiltersContext";
+import { useRestaurant } from "../context/RestaurantContext";
 
 interface VariantDrawerProps {
   isOpen: boolean;
@@ -36,12 +37,39 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
   onSelectVariant,
 }) => {
   const { theme } = useFiltersContext();
+  const { state: restaurantState } = useRestaurant();
+  const [selectedVariant, setSelectedVariant] = useState<{
+    id: number;
+    name: string;
+    price: string;
+    image?: string;
+    title?: string;
+    description?: string;
+  } | null>(null);
 
   if (!isOpen || !item) return null;
 
+  const handleVariantSelect = (variant: {
+    id: number;
+    name: string;
+    price: string;
+    image?: string;
+    title?: string;
+    description?: string;
+  }) => {
+    setSelectedVariant(variant);
+  };
+
+  const handleAddToCart = () => {
+    if (selectedVariant) {
+      onSelectVariant(selectedVariant);
+      onClose();
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-end justify-center">
-      <div className="bg-white w-full h-[90vh] rounded-t-3xl overflow-hidden">
+      <div className="bg-white w-full h-[90vh] rounded-t-3xl overflow-hidden flex flex-col">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-white border-b px-4 py-3">
           <div className="flex items-center justify-between">
@@ -61,7 +89,7 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto h-full">
+        <div className="flex-1 overflow-y-auto">
           {/* Product Image */}
           <div className="relative h-48 w-full">
             <img
@@ -87,60 +115,55 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
               <h4 className="text-base font-medium text-gray-800">
                 Available Variants
               </h4>
-              <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
                 {item.variants.map((variant) => (
                   <button
                     key={variant.id}
-                    onClick={() =>
-                      onSelectVariant({
-                        id: variant.id,
-                        name: variant.title || "",
-                        price: variant.price,
-                        image: item.image,
-                      })
-                    }
-                    className="w-full p-4 rounded-xl border flex items-center justify-between hover:bg-gray-50 transition-colors group"
+                    onClick={() => handleVariantSelect(variant)}
+                    className={`p-1 rounded-xl border flex flex-col items-center justify-center transition-colors ${
+                      selectedVariant?.id === variant.id
+                        ? "border-primary bg-primary/5"
+                        : "hover:bg-gray-50"
+                    }`}
                     style={{
-                      borderColor: theme.border,
+                      borderColor:
+                        selectedVariant?.id === variant.id
+                          ? theme.primary
+                          : theme.border,
                       color: theme.modalMainText,
                     }}
                   >
-                    <div className="flex items-center gap-4">
-                      {variant.image && (
-                        <img
-                          src={variant.image}
-                          alt={variant.name}
-                          className="w-16 h-16 object-cover rounded-lg"
-                        />
-                      )}
-                      <div className="text-left">
-                        <h4 className="font-medium">{variant.name}</h4>
-                        {variant.title && (
-                          <p className="text-sm text-gray-500 mt-0.5">
-                            {variant.title}
-                          </p>
-                        )}
-                        {variant.description && (
-                          <p className="text-xs text-gray-400 mt-0.5 line-clamp-2">
-                            {variant.description}
-                          </p>
-                        )}
-                        <p className="text-sm font-medium text-primary mt-1">
-                          {variant.price} AED
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-500 group-hover:text-primary transition-colors">
-                        Add
-                      </span>
-                      <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" />
-                    </div>
+                    <h4 className="font-small text-center">{variant.title}</h4>
+                    <p className="text-sm font-medium text-primary">
+                      {variant.price} AED
+                    </p>
                   </button>
                 ))}
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Add to Cart Button */}
+        <div className="sticky bottom-0 bg-white border-t p-4">
+          <button
+            onClick={handleAddToCart}
+            disabled={!selectedVariant}
+            className={`w-full py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-medium transition-colors ${
+              selectedVariant
+                ? theme.primary
+                : "bg-gray-200 text-gray-500 cursor-not-allowed"
+            }`}
+            style={{
+              backgroundColor: selectedVariant
+                ? restaurantState.storeConfig?.theme
+                : "#919191",
+              color: "white",
+            }}
+          >
+            <ShoppingCart className="w-5 h-5" />
+            {selectedVariant ? "Add to Cart" : "Select a Variant"}
+          </button>
         </div>
       </div>
     </div>
