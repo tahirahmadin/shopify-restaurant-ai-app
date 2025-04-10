@@ -65,20 +65,8 @@ export const CartSummary: React.FC = () => {
   };
 
   const handleCheckout = () => {
-    if (!isAuthenticated) {
-      setIsExpanded(false);
-      return;
-    }
-
     if (state.cart.length === 0) {
       alert("Your cart is empty");
-      return;
-    }
-
-    if (addresses.length === 0) {
-      alert("Please add a delivery address first");
-      setIsExpanded(false);
-      setIsAddressModalOpen(true);
       return;
     }
 

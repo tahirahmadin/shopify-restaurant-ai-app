@@ -114,7 +114,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
               {restaurantState.cashMode && (
                 <button
                   onClick={() => {
-                    window.parent.location.href = "/cart";
+                    window.parent.postMessage({ action: "OPEN_CART" }, "*");
                   }}
                   style={{
                     backgroundColor: theme.chatBubbleBg,

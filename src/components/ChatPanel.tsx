@@ -308,9 +308,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
           state.mode === "browse" ? "hidden" : ""
         }`}
         ref={chatContainerRef}
-        style={{ height: `${getVH() - 160}px` }}
+        style={{ height: `${getVH() - 100}px` }}
       >
-        {console.log(state.messages)}
         {state.messages.map((message) => (
           <Message key={message.id} message={message} onRetry={() => {}} />
         ))}

@@ -8,7 +8,6 @@ import { DunkinOrderApp } from "./DunkinOrderApp";
 import { CustomizationModal } from "./CustumizationModal";
 import { AddressModal } from "./AddressModal";
 import { FiltersProvider } from "../context/FiltersContext";
-import Testing from "./Testing";
 import { VariantDrawer } from "./VariantDrawer";
 import { useChatContext } from "../context/ChatContext";
 
@@ -30,7 +29,6 @@ const MainContent = () => {
         name: variant.name,
         price: variant.price,
         quantity: 1,
-        restaurant: state.selectedRestaurant || "",
         image: variant.image,
       },
     });

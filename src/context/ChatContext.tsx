@@ -105,15 +105,7 @@ export interface CartItem {
   name: string;
   price: string;
   quantity: number;
-  restaurant: string;
   image: string;
-  customizations?: {
-    categoryName: string;
-    selection: {
-      name: string;
-      price: number;
-    };
-  }[];
 }
 
 type ChatAction =

@@ -91,7 +91,14 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
                 {item.variants.map((variant) => (
                   <button
                     key={variant.id}
-                    onClick={() => onSelectVariant(variant)}
+                    onClick={() =>
+                      onSelectVariant({
+                        id: variant.id,
+                        name: variant.title || "",
+                        price: variant.price,
+                        image: item.image,
+                      })
+                    }
                     className="w-full p-4 rounded-xl border flex items-center justify-between hover:bg-gray-50 transition-colors group"
                     style={{
                       borderColor: theme.border,
