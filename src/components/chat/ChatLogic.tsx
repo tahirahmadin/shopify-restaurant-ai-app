@@ -227,17 +227,9 @@ const classifyIntent = async (
 };
 
 export const useChatLogic = ({
-  input,
   restaurantState,
-  state,
   dispatch,
-  orders,
   selectedStyle,
-  isVegOnly,
-  numberOfPeople,
-  setRestaurants,
-  addresses,
-  chatHistory,
 }: ChatLogicProps) => {
   const determineQueryType = (query: string): QueryType => {
     const menuKeywords = [
@@ -313,32 +305,37 @@ export const useChatLogic = ({
 
       const SELLER_ID = restaurantState.activeRestroId;
 
-      const SYSTEM_PROMPT = `You are an item recommendation system for a Shopify store. Your task is to recommend items to users based on their queries.
+      const SYSTEM_PROMPT = `You are an item recommendation system for a Shopify store.
 
-      You can use the following tool:
-      - getProducts(sellerId): Use this to fetch all products for the store. Always pass the sellerId as "${SELLER_ID}". Do not pass null, undefined, or invalid values.
+      You must return a single, strictly formatted JSON object using the following schema:
       
-      When responding, you must return a JSON object with the following structure:
       {
         "text": "", 
         "items": []
       }
       
       Where:
-      - "text" is a concise, creative response that acknowledges the user's query and explains your recommendation.
-      - "items" is an array of product objects returned from the tool call getProductsByIds.
+      - "text" is a string with your entire response to the user, including all explanations or recommendations.
+      - "items" is an array of product objects returned from getProductsByIds.
       
-      STRICT FORMAT RULES:
-      - DO NOT include markdown formatting.
-      - DO NOT include explanations or additional commentary outside the JSON.
-      - DO NOT add any special characters or quotes before or after the JSON.
-      - Only return a valid JSON object, and nothing else.
-      - Ensure the JSON is well-formed and parseable.
+      You may use the following tool:
+      - getProducts(sellerId): Always call this with sellerId = "${SELLER_ID}" to fetch available products. Do not pass null or undefined.
       
       RECOMMENDATION RULES:
-      - Return a maximum of 5 items in the "items" array unless the user explicitly asks to see all products.
-      - If the user requests "all items" or "entire catalog", include all available products.
-      - Always choose the most relevant products based on the user query.`;
+      - Recommend up to 5 relevant items based on the user’s query.
+      - If the user explicitly asks for "all items" or "entire catalog", include all.
+      - If no products match, respond with an empty array and a helpful message in "text".
+      
+      STRICT FORMAT RULES — DO NOT BREAK THESE:
+      - ABSOLUTELY NOTHING outside the JSON object.
+      - NO introductory text, titles, or comments before or after the JSON.
+      - DO NOT wrap the JSON in backticks or markdown.
+      - DO NOT explain your response.
+      - DO NOT repeat the JSON schema or any instruction.
+      - Your entire response — both message and items — MUST be inside the JSON.
+      - Your output must start with { and end with } — no exceptions.
+      
+      FAILURE TO FOLLOW THESE RULES WILL RESULT IN INVALID OUTPUT.`;
 
       const menuResponse = await genAIResponse(
         formattedMessages,

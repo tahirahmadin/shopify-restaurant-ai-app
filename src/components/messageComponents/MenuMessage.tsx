@@ -21,7 +21,7 @@ export const MenuMessage: React.FC<MenuMessageProps> = ({
   if (message.queryType === "GENERAL") {
     return (
       <div className="pr-3 flex-shrink-0 flex">
-        {selectedStyle && (
+        {selectedStyle && message.isBot && (
           <img
             src={selectedStyle.image}
             alt={selectedStyle.name}
