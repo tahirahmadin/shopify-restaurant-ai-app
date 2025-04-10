@@ -17,6 +17,7 @@ import {
   SpeechService,
   SpeechRecognitionResult,
 } from "../services/speechService";
+import { getSellerIdViaAccessToken } from "../actions/serverActions";
 
 export const DunkinOrderApp: React.FC = () => {
   const { toast, hideToast } = useToast();
@@ -46,30 +47,40 @@ export const DunkinOrderApp: React.FC = () => {
 
   // Set initial restaurant if needed
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const sellerIdParam = params.get("sellerId");
-    console.log("Seller ID in URL:", sellerIdParam);
-    const shopifyThemeColor = "#000000";
-    const initialRestroName = "CurateHome";
-    const backImageUrl =
-      "https://www.curatehome.me/cdn/shop/files/5_300x.png?v=1684928640";
+    async function asyncFn() {
+      const params = new URLSearchParams(window.location.search);
+      const accessTokenParam = params.get("accessToken");
+      console.log("accessTokenParam in URL:", accessTokenParam);
 
-    const sellerId = sellerIdParam;
-    // const sellerId = "67f78035a81db033bf9f1040";
+      const initialRestroName = "CurateHome";
+      const backImageUrl =
+        "https://www.curatehome.me/cdn/shop/files/5_300x.png?v=1684928640";
 
-    if (sellerId && restaurantState.singleMode) {
-      console.log("Seller ID:", sellerId);
+      const accessToken = accessTokenParam;
+      // const accessToken = "shpat_23de0a8b948b08088356e57768702";
 
-      restaurantDispatch({
-        type: "SET_BACKGROUND_IMAGE",
-        payload: backImageUrl,
-      });
-      restaurantDispatch({
-        type: "SET_ACTIVE_RESTRO",
-        payload: sellerId,
-      });
-      dispatch({ type: "SET_SELECTED_RESTAURANT", payload: initialRestroName });
+      if (accessToken) {
+        // console.log("Going here");
+        let sellerId = await getSellerIdViaAccessToken(accessToken);
+        console.log("Seller ID:", sellerId);
+
+        if (sellerId) {
+          restaurantDispatch({
+            type: "SET_BACKGROUND_IMAGE",
+            payload: backImageUrl,
+          });
+          restaurantDispatch({
+            type: "SET_ACTIVE_RESTRO",
+            payload: sellerId,
+          });
+          dispatch({
+            type: "SET_SELECTED_RESTAURANT",
+            payload: initialRestroName,
+          });
+        }
+      }
     }
+    asyncFn();
   }, [restaurantState.singleMode]);
 
   // Reset UI state when auth changes.
