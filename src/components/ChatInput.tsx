@@ -7,6 +7,7 @@ import {
   Mic,
   MicOff,
   Store,
+  ExternalLink,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -23,6 +24,8 @@ interface ChatInputProps {
   isSpeechSupported?: boolean;
   onSpeechToggle?: () => void;
   interimTranscript?: string;
+  isInShopifyIframe?: boolean;
+  onOpenStandalone?: () => void;
 }
 import { useFiltersContext } from "../context/FiltersContext";
 import { useRestaurant } from "../context/RestaurantContext";
@@ -40,6 +43,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   isSpeechSupported = false,
   onSpeechToggle = () => {},
   interimTranscript = "",
+  isInShopifyIframe = false,
+  onOpenStandalone = () => {},
 }) => {
   const { addresses } = useAuth();
   const { theme } = useFiltersContext();
@@ -205,6 +210,20 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             ) : (
               <Mic className="w-5 h-5" aria-hidden="true" />
             )}
+          </button>
+        )}
+
+        {/* Special button for Shopify iframe environment */}
+        {isInShopifyIframe && (
+          <button
+            type="button"
+            onClick={onOpenStandalone}
+            aria-label="Enable voice in new window"
+            className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100 flex items-center"
+            title="Voice input not available in embedded mode. Click to open in new tab."
+          >
+            <ExternalLink className="w-5 h-5 mr-1" aria-hidden="true" />
+            <Mic className="w-5 h-5" aria-hidden="true" />
           </button>
         )}
 

@@ -40,6 +40,8 @@ interface ChatPanelProps {
   isSpeechSupported?: boolean;
   onSpeechToggle?: () => void;
   interimTranscript?: string;
+  isInShopifyIframe?: boolean;
+  onOpenStandalone?: () => void;
 }
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({
@@ -54,6 +56,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   isSpeechSupported = false,
   onSpeechToggle = () => {},
   interimTranscript = "",
+  isInShopifyIframe = false,   
+  onOpenStandalone = () => {},
 }) => {
   const { state, dispatch } = useChatContext();
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -564,9 +568,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
         }
         isLoading={isLoading}
         isSpeechEnabled={isSpeechEnabled}
-        isSpeechSupported={isSpeechSupported}
+        isSpeechSupported={isSpeechSupported && !isInShopifyIframe} 
         onSpeechToggle={onSpeechToggle}
         interimTranscript={interimTranscript}
+        isInShopifyIframe={isInShopifyIframe}
+        onOpenStandalone={onOpenStandalone}
       />
     </>
   );
