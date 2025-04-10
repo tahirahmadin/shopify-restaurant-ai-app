@@ -7,6 +7,7 @@ import {
   Mic,
   MicOff,
   Store,
+  AlertCircle,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -52,17 +53,18 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const captureInputRef = useRef<HTMLInputElement>(null);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [showImageOptions, setShowImageOptions] = useState(false);
-  const [isInIframe, setIsInIframe] = useState(false);
+  const [micPermissionError, setMicPermissionError] = useState<string | null>(null);
+  const [showMicError, setShowMicError] = useState(false);
 
-  // Check if we're in an iframe on mount
+  // Clear mic error after a few seconds
   useEffect(() => {
-    try {
-      setIsInIframe(window !== window.top);
-    } catch (e) {
-      // If we can't access window.top, we're definitely in an iframe
-      setIsInIframe(true);
+    if (showMicError) {
+      const timer = setTimeout(() => {
+        setShowMicError(false);
+      }, 5000);
+      return () => clearTimeout(timer);
     }
-  }, []);
+  }, [showMicError]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -139,8 +141,30 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     }, 0);
   };
 
-  // Only show microphone button if not in an iframe
-  const showMicButton = isSpeechSupported && !isInIframe;
+  // Modified speech toggle to handle errors more elegantly
+  const handleSpeechToggle = () => {
+    try {
+      // Clear any previous error
+      setMicPermissionError(null);
+      
+      // Call the provided speech toggle function
+      onSpeechToggle();
+      
+      // Listen for errors that might happen during speech recognition
+      window.addEventListener('speechrecognitionerror', (e: any) => {
+        console.log("Speech recognition error caught:", e);
+        if (e.error === 'not-allowed' || e.error === 'permission-denied') {
+          setMicPermissionError("Please allow microphone access in your browser settings.");
+          setShowMicError(true);
+        }
+      }, { once: true }); // Only listen once
+      
+    } catch (error) {
+      console.error("Error toggling speech recognition:", error);
+      setMicPermissionError("Microphone access failed. Please check browser settings.");
+      setShowMicError(true);
+    }
+  };
 
   return (
     <div
@@ -152,12 +176,21 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         borderColor: `${theme.text}10`,
       }}
     >
+      {/* Display microphone permission error message */}
+      {showMicError && micPermissionError && (
+        <div className="mb-2 px-3 py-2 bg-red-50 text-red-800 rounded-lg text-sm flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <span>{micPermissionError}</span>
+        </div>
+      )}
+      
       {/* Display interim transcript during speech recognition */}
       {isSpeechEnabled && interimTranscript && (
         <div className="mb-2 px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 italic">
           {interimTranscript}
         </div>
       )}
+      
       <div className="w-full">
         {showQuickActions && !input && !isKeyboardOpen && (
           <div className="grid grid-cols-2 gap-2 mb-1 max-h-[120px] overflow-y-auto">
@@ -194,7 +227,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         <input
           ref={inputRef}
           type="text"
-          placeholder={isSpeechEnabled ? "Listening..." : placeholder}
+          placeholder={isSpeechEnabled ? "Listening..." : "Ask here..."}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           className="flex-1 bg-transparent focus:outline-none text-[16px] min-h-[40px] transition-colors duration-300"
@@ -204,11 +237,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           }}
         />
 
-        {/* Microphone button - only show if not in iframe */}
-        {showMicButton && (
+        {/* Microphone button */}
+        {isSpeechSupported && (
           <button
             type="button"
-            onClick={onSpeechToggle}
+            onClick={handleSpeechToggle}
             aria-label={
               isSpeechEnabled ? "Stop voice input" : "Start voice input"
             }

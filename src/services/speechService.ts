@@ -1,3 +1,4 @@
+// Speech Service with Shopify iframe support
 export interface SpeechRecognitionResult {
   transcript: string;
   isFinal: boolean;
@@ -6,35 +7,17 @@ export interface SpeechRecognitionResult {
 export class SpeechService {
   private recognition: any;
   private isListening: boolean = false;
-  private inIframe: boolean = false;
   
   constructor() {
-    // Check if we're in an iframe first
-    try {
-      this.inIframe = window !== window.top;
-      console.log("Speech service initialized in", this.inIframe ? "iframe" : "main window");
-    } catch (e) {
-      // If we can't access window.top, we're definitely in an iframe
-      this.inIframe = true;
-      console.log("Speech service detected iframe (through exception)");
-    }
+    // Check if SpeechRecognition is available in the browser
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
-    // Only initialize speech recognition when not in an iframe
-    if (!this.inIframe) {
-      // Check if SpeechRecognition is available in the browser
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      
-      if (SpeechRecognition) {
-        this.recognition = new SpeechRecognition();
-        this.configureRecognition();
-      } else {
-        console.warn('Speech recognition is not supported in this browser');
-        this.recognition = null;
-      }
+    if (SpeechRecognition) {
+      this.recognition = new SpeechRecognition();
+      this.configureRecognition();
     } else {
-      // Don't initialize recognition at all in iframe
+      console.warn('Speech recognition is not supported in this browser');
       this.recognition = null;
-      console.log("Speech recognition disabled in iframe environment");
     }
   }
   
@@ -48,18 +31,19 @@ export class SpeechService {
   }
   
   public isSupported(): boolean {
-    // Never report as supported in an iframe
-    if (this.inIframe) return false;
     return !!this.recognition;
   }
   
   // Request microphone permission explicitly
   public async requestMicrophonePermission(): Promise<boolean> {
-    // Never even try to request permission in an iframe
-    if (this.inIframe) return false;
-    
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // For Shopify iframe: try to request permission through allow="microphone" attribute
+      // This requires the Shopify admin to add this attribute to the iframe
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: true,
+        video: false
+      });
+      
       // If we get here, permission was granted
       // Stop all tracks to release the microphone
       stream.getTracks().forEach(track => track.stop());
@@ -74,12 +58,6 @@ export class SpeechService {
     onResult: (result: SpeechRecognitionResult) => void,
     onError: (error: string) => void
   ) {
-    // Never even try to start listening in an iframe
-    if (this.inIframe) {
-      onError('Speech recognition is not available in embedded mode');
-      return;
-    }
-    
     if (!this.recognition) {
       onError('Speech recognition not supported');
       return;
@@ -93,7 +71,7 @@ export class SpeechService {
     try {
       const hasPermission = await this.requestMicrophonePermission();
       if (!hasPermission) {
-        onError('Microphone permission denied. Please allow microphone access.');
+        onError('Microphone permission denied. Please allow microphone access in your browser settings.');
         return;
       }
     } catch (error) {
@@ -123,7 +101,7 @@ export class SpeechService {
       switch (event.error) {
         case 'not-allowed':
         case 'permission-denied':
-          errorMessage = 'Microphone access is blocked. Please allow it in your browser settings.';
+          errorMessage = 'To use voice, please allow microphone access in your browser settings.';
           break;
         case 'no-speech':
           errorMessage = 'No speech detected. Please speak louder or check your microphone.';
