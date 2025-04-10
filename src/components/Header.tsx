@@ -6,6 +6,7 @@ interface HeaderProps {
   onCartClick: () => void;
 }
 import { useFiltersContext } from "../context/FiltersContext";
+import { Filters } from "./Filters";
 
 export const Header: React.FC<HeaderProps> = () => {
   const { theme } = useFiltersContext();
@@ -36,12 +37,13 @@ export const Header: React.FC<HeaderProps> = () => {
         <div
           className="text-xl font-bold transition-colors duration-300 pl-2 w-full"
           style={{
-            color: theme.headerBg,
+            color: "#ffffff",
           }}
         >
           {restaurantState.storeConfig?.botTitle || "Shopify Store"}
         </div>
       </div>
+      <Filters />
     </div>
   );
 };

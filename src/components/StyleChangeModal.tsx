@@ -22,25 +22,19 @@ export const StyleChangeModal: React.FC<StyleChangeModalProps> = ({
   const { theme } = useFiltersContext();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 mt-[-50px]">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
-        style={{ backgroundColor: theme.modalBg }}
+        style={{ backgroundColor: "#f9f9f9" }}
       />
-      <div
-        className="relative rounded-xl shadow-lg w-full max-w-sm animate-slide-up overflow-hidden"
-        style={{ backgroundColor: theme.modalBg }}
-      >
+      <div className="relative rounded-xl shadow-lg w-full max-w-sm animate-slide-up overflow-hidden">
         <div
           className="p-4 border-b"
-          style={{ backgroundColor: theme.modalBgLight }}
+          style={{ backgroundColor: theme.primary }}
         >
           <div className="flex items-center justify-between">
-            <h3
-              className="text-lg font-semibold"
-              style={{ color: theme.modalSecondText }}
-            >
+            <h3 className="text-lg font-semibold" style={{ color: "white" }}>
               Change Conversation Style
             </h3>
             <button
@@ -52,7 +46,7 @@ export const StyleChangeModal: React.FC<StyleChangeModalProps> = ({
           </div>
         </div>
 
-        <div className="p-4 " style={{ backgroundColor: theme.modalBg }}>
+        <div className="p-4 " style={{ backgroundColor: "#e5e5e5" }}>
           <div className="flex items-center justify-between gap-6 mb-6">
             {/* Current Style */}
             <div className="flex-1 text-center relative">
@@ -62,10 +56,10 @@ export const StyleChangeModal: React.FC<StyleChangeModalProps> = ({
                     currentStyle === "Gobbl"
                       ? "https://gobbl-bucket.s3.ap-south-1.amazonaws.com/tapAssets/gobbl_coin.webp"
                       : currentStyle === "Trump"
-                      ? "https://images.unsplash.com/photo-1580128660010-fd027e1e587a?q=80&w=1964&auto=format&fit=crop"
-                      : currentStyle === "CZ Binance"
-                      ? "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSnI1JQg6mXsN66qOzLiX2n5IOgWYBXi01rzQeEQto8EiGsWnZUCvv6jN3A5KrBIhVh2VvRfI6_KbtkLRin1G0Bsg"
-                      : "https://img.delicious.com.au/D-EUAdrh/w759-h506-cfill/del/2017/06/gordon-ramsay-47340-2.jpg"
+                        ? "https://images.unsplash.com/photo-1580128660010-fd027e1e587a?q=80&w=1964&auto=format&fit=crop"
+                        : currentStyle === "CZ Binance"
+                          ? "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSnI1JQg6mXsN66qOzLiX2n5IOgWYBXi01rzQeEQto8EiGsWnZUCvv6jN3A5KrBIhVh2VvRfI6_KbtkLRin1G0Bsg"
+                          : "https://img.delicious.com.au/D-EUAdrh/w759-h506-cfill/del/2017/06/gordon-ramsay-47340-2.jpg"
                   }
                   alt={currentStyle}
                   className="w-full h-full object-cover"
@@ -97,10 +91,10 @@ export const StyleChangeModal: React.FC<StyleChangeModalProps> = ({
                     newStyle === "Gobbl"
                       ? "https://gobbl-bucket.s3.ap-south-1.amazonaws.com/tapAssets/gobbl_coin.webp"
                       : newStyle === "Trump"
-                      ? "https://images.unsplash.com/photo-1580128660010-fd027e1e587a?q=80&w=1964&auto=format&fit=crop"
-                      : newStyle === "CZ Binance"
-                      ? "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSnI1JQg6mXsN66qOzLiX2n5IOgWYBXi01rzQeEQto8EiGsWnZUCvv6jN3A5KrBIhVh2VvRfI6_KbtkLRin1G0Bsg"
-                      : "https://img.delicious.com.au/D-EUAdrh/w759-h506-cfill/del/2017/06/gordon-ramsay-47340-2.jpg"
+                        ? "https://images.unsplash.com/photo-1580128660010-fd027e1e587a?q=80&w=1964&auto=format&fit=crop"
+                        : newStyle === "CZ Binance"
+                          ? "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSnI1JQg6mXsN66qOzLiX2n5IOgWYBXi01rzQeEQto8EiGsWnZUCvv6jN3A5KrBIhVh2VvRfI6_KbtkLRin1G0Bsg"
+                          : "https://img.delicious.com.au/D-EUAdrh/w759-h506-cfill/del/2017/06/gordon-ramsay-47340-2.jpg"
                   }
                   alt={newStyle}
                   className="w-full h-full object-cover"
@@ -122,9 +116,9 @@ export const StyleChangeModal: React.FC<StyleChangeModalProps> = ({
           </div>
           <div
             className="rounded-lg p-3 text-center"
-            style={{ backgroundColor: theme.modalBgLight }}
+            style={{ backgroundColor: "#bdbdbd" }}
           >
-            <p className=" text-sm" style={{ color: theme.modalSecondText }}>
+            <p className=" text-sm" style={{ color: "#000000" }}>
               Changing the conversation style will clear your current chat
               history.
             </p>
@@ -138,13 +132,14 @@ export const StyleChangeModal: React.FC<StyleChangeModalProps> = ({
           <button
             onClick={onClose}
             className="flex-1 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+            style={{ backgroundColor: "#f9f9f9", color: "#000000" }}
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             className="flex-1 px-4 py-2 text-sm bg-primary text-white rounded-lg hover:bg-primary-600 transition-colors font-medium"
-            style={{ backgroundColor: theme.primary, color: theme.background }}
+            style={{ backgroundColor: theme.primary, color: "#ffffff" }}
           >
             Continue
           </button>

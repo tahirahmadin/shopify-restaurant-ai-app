@@ -318,7 +318,6 @@ export const DunkinOrderApp: React.FC = () => {
               onOpenPanel={() => setIsPanelOpen(true)}
               onCartClick={() => setIsCartOpen(!isCartOpen)}
             />
-            {/* <Filters /> */}
           </div>
           <div className="flex-1 mt-[50px] overflow-auto pb-25">
             <ChatPanel

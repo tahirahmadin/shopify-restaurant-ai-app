@@ -2,16 +2,11 @@ import React, { useRef, useEffect, useState, FormEvent } from "react";
 import {
   Send,
   ImageIcon,
-  Leaf,
   Clock as Timer,
-  Zap,
-  Tag,
-  Pizza,
   Camera,
   Mic,
   MicOff,
   Store,
-  Hand,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -163,7 +158,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                   }}
                   type="button"
                 >
-                  <Store className="w-3.5 h-3.5" />
                   <span>{singleCue.title}</span>
                 </button>
               );

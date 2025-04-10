@@ -1,69 +1,21 @@
 import React, { useState, useEffect } from "react";
-import {
-  MessageSquare,
-  Menu,
-  X,
-  Store,
-  Leaf,
-  Zap,
-  MapPin,
-  ChevronDown,
-  Plus,
-  Home,
-  Minus,
-  Bot,
-} from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useChatContext } from "../context/ChatContext";
-import { useRestaurant } from "../context/RestaurantContext";
 import { useAuth } from "../context/AuthContext";
 import { useFiltersContext } from "../context/FiltersContext";
-import { RestaurantChangeModal } from "./RestaurantChangeModal";
 import { StyleChangeModal } from "./StyleChangeModal";
-import { ChatModel } from "../context/ChatContext";
-import { AddressChangeModal } from "./AddressChangeModal";
-import { AddAddressWarningModal } from "./AddAddressWarningModal";
 
 export const Filters: React.FC = () => {
-  const {
-    theme,
-    isVegOnly,
-    setIsVegOnly,
-    isFastDelivery,
-    setIsFastDelivery,
-    numberOfPeople,
-    setNumberOfPeople,
-    selectedStyle,
-    setSelectedStyle,
-  } = useFiltersContext();
+  const { theme, selectedStyle, setSelectedStyle } = useFiltersContext();
 
   const { state, dispatch } = useChatContext();
-  const { state: restaurantState, setActiveRestaurant } = useRestaurant();
-  const {
-    addresses,
-    isAuthenticated,
-    isAddressModalOpen,
-    setIsAddressModalOpen,
-    setAddresses,
-  } = useAuth();
-  const [isAddressDropdownOpen, setIsAddressDropdownOpen] = useState(false);
+
+  const { addresses } = useAuth();
   const [selectedAddressIndex, setSelectedAddressIndex] = useState<number>(0);
   const [isStyleDropdownOpen, setIsStyleDropdownOpen] = useState(false);
-  const [isChangeRestaurantModalOpen, setIsChangeRestaurantModalOpen] =
-    useState(false);
-  const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
+
   const [isStyleChangeModalOpen, setIsStyleChangeModalOpen] = useState(false);
   const [pendingStyle, setPendingStyle] = useState<any>(null);
-
-  // New states for address change confirmation
-  const [isAddressChangeModalOpen, setIsAddressChangeModalOpen] =
-    useState(false);
-  const [pendingAddressIndex, setPendingAddressIndex] = useState<number | null>(
-    null
-  );
-
-  const [isAddAddressWarningModalOpen, setIsAddAddressWarningModalOpen] =
-    useState(false);
-  const { state: chatState, dispatch: chatDispatch } = useChatContext();
 
   // Set initial selected address to first address if available
   useEffect(() => {
@@ -71,38 +23,6 @@ export const Filters: React.FC = () => {
       setSelectedAddressIndex(0);
     }
   }, [addresses]);
-
-  // Modified: Instead of directly updating the address, store the pending index and show the modal.
-  const handleAddressSelect = (index: number) => {
-    if (index === selectedAddressIndex) return;
-    setPendingAddressIndex(index);
-    setIsAddressChangeModalOpen(true);
-  };
-
-  // Confirm handler for the address change modal
-  const handleAddressChangeConfirm = async () => {
-    if (pendingAddressIndex === null) return;
-
-    // Move selected address to the front of the array
-    const newAddresses = [...addresses];
-    const [selectedAddress] = newAddresses.splice(pendingAddressIndex, 1);
-    newAddresses.unshift(selectedAddress);
-
-    // Update addresses in backend and state
-    const success = await setAddresses(newAddresses);
-    if (success) {
-      setSelectedAddressIndex(0);
-      setIsAddressDropdownOpen(false);
-      chatDispatch({ type: "RESET_STATE" });
-    }
-    setPendingAddressIndex(null);
-    setIsAddressChangeModalOpen(false);
-  };
-
-  const handleAddNewAddressClick = () => {
-    setIsAddAddressWarningModalOpen(true);
-    setIsAddressDropdownOpen(false);
-  };
 
   const conversationStyles = [
     {
@@ -127,26 +47,6 @@ export const Filters: React.FC = () => {
     },
   ];
 
-  const handleClearRestaurant = () => {
-    if (restaurantState.activeRestroId) {
-      // If there are items in the cart, show confirmation
-      if (state.cart.length > 0) {
-        setIsChangeRestaurantModalOpen(true);
-      } else {
-        // If cart is empty, just clear restaurant selection
-        dispatch({ type: "SET_SELECTED_RESTAURANT", payload: null });
-        setActiveRestaurant(null);
-      }
-    }
-  };
-
-  const handleConfirmRestaurantChange = () => {
-    dispatch({ type: "CLEAR_CART" });
-    dispatch({ type: "SET_SELECTED_RESTAURANT", payload: null });
-    setActiveRestaurant(null);
-    setIsChangeRestaurantModalOpen(false);
-  };
-
   const handleStyleSelect = (style: any) => {
     setPendingStyle(style);
     setIsStyleChangeModalOpen(true);
@@ -163,115 +63,9 @@ export const Filters: React.FC = () => {
   };
 
   return (
-    <div
-      className="px-4 py-1 border-b"
-      style={{
-        backgroundColor: theme.filtersBg || "#0B0E11",
-        borderColor: theme.border,
-      }}
-    >
+    <div className="px-4">
       {/* Home Address Section */}
-      <div className="relative w-full flex justify-between items-center gap-2 mb-1">
-        <div className="relative flex-1 max-w-[60%]">
-          <button
-            onClick={() => setIsAddressDropdownOpen(!isAddressDropdownOpen)}
-            className="flex items-center gap-1 p-1 rounded-lg transition-colors w-full max-w-full"
-            style={{
-              backgroundColor: theme.cardBg,
-              color: theme.text,
-              borderColor: theme.border,
-              ":hover": { backgroundColor: theme.hover },
-            }}
-            disabled={!isAuthenticated}
-          >
-            <MapPin
-              className="w-3.5 h-3.5"
-              style={{ color: theme.filtersIconColor }}
-            />
-            <div
-              className="text-[10px] font-medium truncate max-w-[200px]"
-              style={{ color: theme.text }}
-            >
-              <span className="font-bold">
-                {isAuthenticated
-                  ? addresses[selectedAddressIndex]?.type || ""
-                  : ""}
-              </span>{" "}
-              -{" "}
-              {isAuthenticated
-                ? addresses[selectedAddressIndex]?.address ||
-                  "Add delivery address"
-                : "Sign in to add address..."}
-            </div>
-            <ChevronDown className="w-3 h-3" style={{ color: theme.text }} />
-          </button>
-
-          {/* Address Dropdown */}
-          {isAddressDropdownOpen && (
-            <div
-              className="absolute top-full left-0 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50"
-              style={{
-                backgroundColor: theme.filtersBg,
-                borderColor: theme.filtersBorder,
-              }}
-            >
-              {addresses.map((addr, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleAddressSelect(index)}
-                  className={`flex items-start gap-2 w-full px-3 py-2 hover:bg-gray-50 transition-colors`}
-                  style={{
-                    backgroundColor:
-                      selectedAddressIndex === index
-                        ? theme.filtersButtonHover
-                        : theme.filtersBg,
-                  }}
-                >
-                  <Home
-                    className="w-3.5 h-3.5 mt-0.5 text-gray-400"
-                    style={{ color: theme.filtersIconColor }}
-                  />
-                  <div className="text-left flex-1 min-w-0">
-                    <p
-                      className="text-[11px] font-medium line-clamp-1"
-                      style={{ color: theme.filtersText }}
-                    >
-                      {addr.name}
-                    </p>
-                    <p
-                      className="text-[10px]  line-clamp-1 max-w-[180px] opacity-80"
-                      style={{ color: theme.filtersText }}
-                    >
-                      {addr.address}
-                    </p>
-                    <p
-                      className="text-[9px] opacity-70"
-                      style={{ color: theme.filtersText }}
-                    >
-                      {addr.type}
-                    </p>
-                  </div>
-                </button>
-              ))}
-              <button
-                onClick={handleAddNewAddressClick}
-                className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-50 transition-colors border-t"
-              >
-                <Plus
-                  className="w-3.5 h-3.5"
-                  style={{ color: theme.primary }}
-                />
-                <span
-                  className="text-[11px] font-medium"
-                  style={{ color: theme.primary }}
-                >
-                  Add New Address
-                </span>
-              </button>
-            </div>
-          )}
-        </div>
-
+      <div className="relative w-full flex justify-end items-center">
         {/* Agent A (Right Side) */}
         <div className="relative">
           <button
@@ -330,11 +124,6 @@ export const Filters: React.FC = () => {
 
       {/* Filters Section */}
 
-      <RestaurantChangeModal
-        isOpen={isChangeRestaurantModalOpen}
-        onClose={() => setIsChangeRestaurantModalOpen(false)}
-        onConfirm={handleConfirmRestaurantChange}
-      />
       <StyleChangeModal
         isOpen={isStyleChangeModalOpen}
         onClose={() => {
@@ -345,83 +134,6 @@ export const Filters: React.FC = () => {
         currentStyle={selectedStyle.name}
         newStyle={pendingStyle?.name || ""}
       />
-
-      {/* Address Change Modal added below */}
-      <AddressChangeModal
-        isOpen={isAddressChangeModalOpen}
-        onClose={() => {
-          setIsAddressChangeModalOpen(false);
-          setPendingAddressIndex(null);
-        }}
-        onConfirm={handleAddressChangeConfirm}
-        currentAddress={addresses[selectedAddressIndex]?.address || ""}
-        newAddress={
-          pendingAddressIndex !== null
-            ? addresses[pendingAddressIndex]?.address || ""
-            : ""
-        }
-      />
-
-      {/* Add Address Warning Modal */}
-      <AddAddressWarningModal
-        isOpen={isAddAddressWarningModalOpen}
-        onClose={() => setIsAddAddressWarningModalOpen(false)}
-        onConfirm={() => {
-          chatDispatch({ type: "RESET_STATE" });
-          setIsAddressModalOpen(true);
-          setIsAddAddressWarningModalOpen(false);
-        }}
-      />
-
-      {/* Navigation Section */}
-      {/* <div className="flex justify-between items-center gap-4 mt-2 border-t border-gray-100 pt-2">
-        <button
-          onClick={() => dispatch({ type: "SET_MODE", payload: "chat" })}
-          className="flex items-center gap-1 transition-colors"
-          style={{
-            color: theme.text,
-          }}
-        >
-          <MessageSquare className="w-4 h-4" />
-          <span className="text-sm">CHAT</span>
-        </button>
-
-        <button
-          onClick={
-            !restaurantState.singleMode ? handleClearRestaurant : () => {}
-          }
-          className="flex items-center gap-1 transition-colors"
-          style={{
-            color: !state.selectedRestaurant ? theme.primary : theme.filtersBg,
-            backgroundColor: state.selectedRestaurant
-              ? theme.filtersIconColor
-              : "transparent",
-            padding: state.selectedRestaurant ? "0.125rem 0.5rem" : "0",
-            borderRadius: state.selectedRestaurant ? "9999px" : "0",
-          }}
-        >
-          <Store className="w-4 h-4" />
-          <span className="text-sm">
-            {state.selectedRestaurant
-              ? state.selectedRestaurant
-              : "All Restaurants"}
-          </span>
-          {state.selectedRestaurant && !restaurantState.singleMode && (
-            <X className="w-3.5 h-3.5" />
-          )}
-        </button>
-
-        <button
-          onClick={() => dispatch({ type: "SET_MODE", payload: "browse" })}
-          className="flex items-center gap-1 transition-colors"
-          style={{
-            color: state.mode === "browse" ? theme.primary : theme.text,
-          }}
-        >
-          <Menu className="w-4 h-4" />
-          <span className="text-sm">BROWSE</span>
-        </button>
-      </div> */}
     </div>
   );
 };
