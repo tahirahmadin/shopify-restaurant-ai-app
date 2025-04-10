@@ -7,7 +7,6 @@ import {
   Mic,
   MicOff,
   Store,
-  ExternalLink,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -24,9 +23,8 @@ interface ChatInputProps {
   isSpeechSupported?: boolean;
   onSpeechToggle?: () => void;
   interimTranscript?: string;
-  isInShopifyIframe?: boolean;
-  onOpenStandalone?: () => void;
 }
+
 import { useFiltersContext } from "../context/FiltersContext";
 import { useRestaurant } from "../context/RestaurantContext";
 
@@ -43,8 +41,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   isSpeechSupported = false,
   onSpeechToggle = () => {},
   interimTranscript = "",
-  isInShopifyIframe = false,
-  onOpenStandalone = () => {},
 }) => {
   const { addresses } = useAuth();
   const { theme } = useFiltersContext();
@@ -56,6 +52,17 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const captureInputRef = useRef<HTMLInputElement>(null);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [showImageOptions, setShowImageOptions] = useState(false);
+  const [isInIframe, setIsInIframe] = useState(false);
+
+  // Check if we're in an iframe on mount
+  useEffect(() => {
+    try {
+      setIsInIframe(window !== window.top);
+    } catch (e) {
+      // If we can't access window.top, we're definitely in an iframe
+      setIsInIframe(true);
+    }
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -132,6 +139,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     }, 0);
   };
 
+  // Only show microphone button if not in an iframe
+  const showMicButton = isSpeechSupported && !isInIframe;
+
   return (
     <div
       className={`p-2 border-t border-white/200 bg-white/50 backdrop-blur-sm left-0 right-0 max-w-md mx-auto z-50 transition-all duration-300 ${className}`}
@@ -184,7 +194,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         <input
           ref={inputRef}
           type="text"
-          placeholder={isSpeechEnabled ? "Listening..." : "Ask here..."}
+          placeholder={isSpeechEnabled ? "Listening..." : placeholder}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           className="flex-1 bg-transparent focus:outline-none text-[16px] min-h-[40px] transition-colors duration-300"
@@ -194,8 +204,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           }}
         />
 
-        {/* Microphone button */}
-        {isSpeechSupported && (
+        {/* Microphone button - only show if not in iframe */}
+        {showMicButton && (
           <button
             type="button"
             onClick={onSpeechToggle}
@@ -210,20 +220,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             ) : (
               <Mic className="w-5 h-5" aria-hidden="true" />
             )}
-          </button>
-        )}
-
-        {/* Special button for Shopify iframe environment */}
-        {isInShopifyIframe && (
-          <button
-            type="button"
-            onClick={onOpenStandalone}
-            aria-label="Enable voice in new window"
-            className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100 flex items-center"
-            title="Voice input not available in embedded mode. Click to open in new tab."
-          >
-            <ExternalLink className="w-5 h-5 mr-1" aria-hidden="true" />
-            <Mic className="w-5 h-5" aria-hidden="true" />
           </button>
         )}
 

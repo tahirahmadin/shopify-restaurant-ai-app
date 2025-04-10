@@ -6,17 +6,35 @@ export interface SpeechRecognitionResult {
 export class SpeechService {
   private recognition: any;
   private isListening: boolean = false;
+  private inIframe: boolean = false;
   
   constructor() {
-    // Check if SpeechRecognition is available in the browser
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    // Check if we're in an iframe first
+    try {
+      this.inIframe = window !== window.top;
+      console.log("Speech service initialized in", this.inIframe ? "iframe" : "main window");
+    } catch (e) {
+      // If we can't access window.top, we're definitely in an iframe
+      this.inIframe = true;
+      console.log("Speech service detected iframe (through exception)");
+    }
     
-    if (SpeechRecognition) {
-      this.recognition = new SpeechRecognition();
-      this.configureRecognition();
+    // Only initialize speech recognition when not in an iframe
+    if (!this.inIframe) {
+      // Check if SpeechRecognition is available in the browser
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      
+      if (SpeechRecognition) {
+        this.recognition = new SpeechRecognition();
+        this.configureRecognition();
+      } else {
+        console.warn('Speech recognition is not supported in this browser');
+        this.recognition = null;
+      }
     } else {
-      console.warn('Speech recognition is not supported in this browser');
+      // Don't initialize recognition at all in iframe
       this.recognition = null;
+      console.log("Speech recognition disabled in iframe environment");
     }
   }
   
@@ -30,27 +48,15 @@ export class SpeechService {
   }
   
   public isSupported(): boolean {
+    // Never report as supported in an iframe
+    if (this.inIframe) return false;
     return !!this.recognition;
-  }
-  
-  public isInIframe(): boolean {
-    try {
-      return window !== window.top;
-    } catch (e) {
-      // If we can't access window.top due to security restrictions, 
-      // we're definitely in an iframe
-      return true;
-    }
   }
   
   // Request microphone permission explicitly
   public async requestMicrophonePermission(): Promise<boolean> {
-    // If we're in an iframe, don't even try to request permission
-    // as it will likely fail and cause console errors
-    if (this.isInIframe()) {
-      console.log("In iframe, skipping microphone permission request");
-      return false;
-    }
+    // Never even try to request permission in an iframe
+    if (this.inIframe) return false;
     
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -59,7 +65,7 @@ export class SpeechService {
       stream.getTracks().forEach(track => track.stop());
       return true;
     } catch (error) {
-      console.warn('Microphone permission denied:', error);
+      console.error('Microphone permission denied:', error);
       return false;
     }
   }
@@ -68,18 +74,18 @@ export class SpeechService {
     onResult: (result: SpeechRecognitionResult) => void,
     onError: (error: string) => void
   ) {
+    // Never even try to start listening in an iframe
+    if (this.inIframe) {
+      onError('Speech recognition is not available in embedded mode');
+      return;
+    }
+    
     if (!this.recognition) {
       onError('Speech recognition not supported');
       return;
     }
     
     if (this.isListening) {
-      return;
-    }
-    
-    // If in iframe, don't even try to start speech recognition
-    if (this.isInIframe()) {
-      onError('Speech recognition is not available in embedded mode');
       return;
     }
     
@@ -110,7 +116,7 @@ export class SpeechService {
     
     // Handle errors with specific error messages
     this.recognition.onerror = (event: any) => {
-      console.warn('Speech recognition error:', event.error);
+      console.error('Speech recognition error:', event.error);
       
       let errorMessage = 'Speech recognition error';
       
