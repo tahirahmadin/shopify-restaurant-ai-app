@@ -193,6 +193,7 @@ export const getSellerIdViaAccessToken = async (
 
 //4. USER:: Update User Addresses
 export const submitUserChatLogs = async (
+  sellerId: string,
   userId: string,
   sessionId: string,
   newUserLog: Array<{
@@ -204,7 +205,7 @@ export const submitUserChatLogs = async (
     let url: string = `https://aggregator.gobbl.ai/api/shopify/updateUserChatLogs`;
 
     // Encrypted data
-    let data = { userId, sessionId, newUserLog };
+    let data = { sellerId, userId, sessionId, newUserLog };
 
     let response: AxiosResponse = await axios
       .post(url, data)

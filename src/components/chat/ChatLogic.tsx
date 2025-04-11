@@ -391,10 +391,15 @@ export const useChatLogic = ({
 
         // Submit chat logs with consistent session IDs
         if (sessionIds) {
-          await submitUserChatLogs(sessionIds.userId, sessionIds.sessionId, [
-            { role: "user", content: latestMessage.text },
-            { role: "assistant", content: menuResponse.text },
-          ]);
+          await submitUserChatLogs(
+            restaurantState.activeRestroId,
+            sessionIds.userId,
+            sessionIds.sessionId,
+            [
+              { role: "user", content: latestMessage.text },
+              { role: "assistant", content: menuResponse.text },
+            ]
+          );
         }
       }
     } catch (error) {
