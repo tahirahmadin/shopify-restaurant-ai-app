@@ -1,11 +1,21 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { submitTokenConsumption } from "./serverActions";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createGroq } from "@ai-sdk/groq";
 
 import getTools from "./ai-tools";
 
 const openAi = createOpenAI({
   apiKey: import.meta.env.VITE_PUBLIC_OPENAI_API_KEY,
+});
+
+const google = createGoogleGenerativeAI({
+  apiKey: import.meta.env.VITE_PUBLIC_GOOGLE_API_KEY,
+});
+
+const groq = createGroq({
+  apiKey: import.meta.env.VITE_PUBLIC_GROQ_API_KEY,
 });
 
 export interface Message {
@@ -23,7 +33,7 @@ export const genAIResponse = async (
 
   try {
     const result = generateText({
-      model: openAi("gpt-4o"),
+      model: groq("llama-3.3-70b-versatile"),
       messages,
       system: SYSTEM_PROMPT,
       maxSteps: 20,
