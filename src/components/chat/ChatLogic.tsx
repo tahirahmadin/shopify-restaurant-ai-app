@@ -2,9 +2,12 @@ import { QueryType } from "../../context/ChatContext";
 import {
   generateLLMResponse,
   getProductsByIds,
+  submitUserChatLogs,
+  getIPAddress,
 } from "../../actions/serverActions";
 import { getMenuByRestaurantId } from "../../utils/menuUtils";
 import { genAIResponse } from "../../actions/aiActions";
+import React from "react";
 
 interface RecommendedItem {
   id?: number;
@@ -231,6 +234,24 @@ export const useChatLogic = ({
   dispatch,
   selectedStyle,
 }: ChatLogicProps) => {
+  // Store session IDs
+  const [sessionIds, setSessionIds] = React.useState<{
+    userId: string;
+    sessionId: string;
+  } | null>(null);
+
+  // Initialize session IDs
+  React.useEffect(() => {
+    const initializeSessionIds = async () => {
+      if (!sessionIds) {
+        const userId = await getIPAddress();
+        const sessionId = Math.random().toString(36).substring(2, 15);
+        setSessionIds({ userId, sessionId });
+      }
+    };
+    initializeSessionIds();
+  }, []);
+
   const determineQueryType = (query: string): QueryType => {
     const menuKeywords = [
       "price",
@@ -367,6 +388,14 @@ export const useChatLogic = ({
             time: now,
           },
         });
+
+        // Submit chat logs with consistent session IDs
+        if (sessionIds) {
+          await submitUserChatLogs(sessionIds.userId, sessionIds.sessionId, [
+            { role: "user", content: latestMessage.text },
+            { role: "assistant", content: menuResponse.text },
+          ]);
+        }
       }
     } catch (error) {
       throw error;

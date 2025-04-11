@@ -191,6 +191,37 @@ export const getSellerIdViaAccessToken = async (
   }
 };
 
+//4. USER:: Update User Addresses
+export const submitUserChatLogs = async (
+  userId: string,
+  sessionId: string,
+  newUserLog: Array<{
+    role: string;
+    content: string;
+  }>
+): Promise<{ error: boolean; result: any }> => {
+  try {
+    let url: string = `https://aggregator.gobbl.ai/api/shopify/updateUserChatLogs`;
+
+    // Encrypted data
+    let data = { userId, sessionId, newUserLog };
+
+    let response: AxiosResponse = await axios
+      .post(url, data)
+      .then((res: AxiosResponse) => res)
+      .catch((err: any) => err.response);
+
+    if (response.data && !response.data.error) {
+      return { error: false, result: response.data.result };
+    } else {
+      return { error: true, result: response.data.result };
+    }
+  } catch (err) {
+    console.error("Update addresses error:", err);
+    return { error: true, result: null };
+  }
+};
+
 // Get all online restaurants
 export const getAllRestaurants = async (
   coordinates?: { lat: number; lng: number } | null,
@@ -395,5 +426,16 @@ export const getUserOrders = async (
   } catch (err) {
     console.error("Orders API exception:", err);
     return { error: true };
+  }
+};
+
+// Get IP address using ipify service
+export const getIPAddress = async (): Promise<string> => {
+  try {
+    const response = await axios.get("https://api.ipify.org?format=json");
+    return response.data.ip;
+  } catch (error) {
+    console.error("Error getting IP address:", error);
+    return window.location.hostname; // Fallback to hostname if IP fetch fails
   }
 };
