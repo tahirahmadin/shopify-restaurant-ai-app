@@ -39,10 +39,12 @@ export const DunkinOrderApp: React.FC = () => {
   // ----- Speech Recognition state -----
   const [isSpeechEnabled, setIsSpeechEnabled] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState("");
-  const [hasMicrophonePermission, setHasMicrophonePermission] = useState<boolean | null>(null);
+  const [hasMicrophonePermission, setHasMicrophonePermission] = useState<
+    boolean | null
+  >(null);
   const [isInShopifyIframe, setIsInShopifyIframe] = useState(false);
   const [showMicModal, setShowMicModal] = useState(false);
-  
+
   const speechService = useMemo(() => new SpeechService(), []);
   const isSpeechSupported = useMemo(
     () => speechService.isSupported(),
@@ -55,23 +57,32 @@ export const DunkinOrderApp: React.FC = () => {
     const checkIfInIframe = () => {
       try {
         const inIframe = window !== window.top;
-        const inShopify = window.location.href.includes('myshopify.com') || 
-                         document.referrer.includes('myshopify.com') ||
-                         (window.location.ancestorOrigins && 
-                          Array.from(window.location.ancestorOrigins).some(origin => 
-                            origin.includes('myshopify.com')
-                          ));
-        
-        setIsInShopifyIframe(inIframe && (inShopify || document.referrer !== ""));
-        console.log("App environment:", inIframe ? "iframe" : "standalone", 
-                    inShopify ? "(Shopify)" : "");
+        const inShopify =
+          window.location.href.includes("myshopify.com") ||
+          document.referrer.includes("myshopify.com") ||
+          (window.location.ancestorOrigins &&
+            Array.from(window.location.ancestorOrigins).some((origin) =>
+              origin.includes("myshopify.com")
+            ));
+
+        setIsInShopifyIframe(
+          inIframe && (inShopify || document.referrer !== "")
+        );
+        console.log(
+          "App environment:",
+          inIframe ? "iframe" : "standalone",
+          inShopify ? "(Shopify)" : ""
+        );
       } catch (e) {
         // If we can't access window.top, we're definitely in an iframe
-        console.log("Exception while checking iframe status - assuming iframe:", e);
+        console.log(
+          "Exception while checking iframe status - assuming iframe:",
+          e
+        );
         setIsInShopifyIframe(true);
       }
     };
-    
+
     checkIfInIframe();
   }, []);
 
@@ -87,6 +98,7 @@ export const DunkinOrderApp: React.FC = () => {
         "https://www.curatehome.me/cdn/shop/files/5_300x.png?v=1684928640";
 
       const accessToken = accessTokenParam;
+      // const accessToken = "";
 
       if (accessToken) {
         let sellerId = await getSellerIdViaAccessToken(accessToken);
@@ -201,7 +213,7 @@ export const DunkinOrderApp: React.FC = () => {
       dispatch({ type: "SET_LOADING", payload: true });
 
       try {
-        await chatLogic.handleMenuQuery(state.messages, userMessage);
+        await chatLogic.handleMenuQuery([...state.messages], userMessage);
       } catch (error) {
         console.error("Error processing AI response:", error);
         dispatch({
@@ -240,34 +252,37 @@ export const DunkinOrderApp: React.FC = () => {
   }, [state.currentQueryType]);
 
   // ----- Speech Recognition handlers -----
-  
+
   // Open app in new tab for microphone access
   const openInNewTab = useCallback(() => {
     const url = window.location.href;
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   }, []);
-  
+
   // Request microphone permission first before enabling speech
   const requestMicrophonePermission = async () => {
     if (!isSpeechSupported) {
       showToast("Speech recognition is not supported in this browser", "error");
       return false;
     }
-    
+
     // If we're in a Shopify iframe, show the modal instead of attempting permission
     if (isInShopifyIframe) {
       setShowMicModal(true);
       return false;
     }
-    
+
     try {
       const hasPermission = await speechService.requestMicrophonePermission();
       setHasMicrophonePermission(hasPermission);
-      
+
       if (!hasPermission) {
-        showToast("Microphone access is blocked. Please allow it in your browser settings.", "error");
+        showToast(
+          "Microphone access is blocked. Please allow it in your browser settings.",
+          "error"
+        );
       }
-      
+
       return hasPermission;
     } catch (error) {
       console.error("Error requesting microphone permission:", error);
@@ -281,7 +296,7 @@ export const DunkinOrderApp: React.FC = () => {
       setInterimTranscript(result.transcript);
       return;
     }
-    
+
     try {
       speechService.stopListening();
       setIsSpeechEnabled(false);
@@ -339,35 +354,35 @@ export const DunkinOrderApp: React.FC = () => {
       showToast("Speech recognition is not supported in this browser", "error");
       return;
     }
-    
+
     // IMPORTANT: Never attempt to use speech recognition in an iframe
     // Instead, always show the modal with instructions to open in new tab
     if (isInShopifyIframe || speechService.isInIframe()) {
       setShowMicModal(true);
       return;
     }
-  
+
     if (isSpeechEnabled) {
       speechService.stopListening();
       setIsSpeechEnabled(false);
       setInterimTranscript("");
     } else {
       // If we don't know if we have permission yet, request it
-      if (hasMicrophonePermission === null || hasMicrophonePermission === false) {
+      if (
+        hasMicrophonePermission === null ||
+        hasMicrophonePermission === false
+      ) {
         const hasPermission = await requestMicrophonePermission();
         if (!hasPermission) return;
       }
-      
+
       setIsSpeechEnabled(true);
-      speechService.startListening(
-        handleSpeechRecognition, 
-        (error: string) => {
-          console.error(error);
-          setIsSpeechEnabled(false);
-          setInterimTranscript("");
-          showToast(error, "error");
-        }
-      );
+      speechService.startListening(handleSpeechRecognition, (error: string) => {
+        console.error(error);
+        setIsSpeechEnabled(false);
+        setInterimTranscript("");
+        showToast(error, "error");
+      });
     }
   };
   // -----------------------------------------
@@ -443,7 +458,7 @@ export const DunkinOrderApp: React.FC = () => {
         <CartSummary />
       </div>
       <SlidePanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} />
-      
+
       {/* Cart Modal */}
       {isCartOpen && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -548,13 +563,15 @@ export const DunkinOrderApp: React.FC = () => {
           </div>
         </div>
       )}
-      
+
       {/* Microphone Access in Iframe Modal */}
       {showMicModal && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-slide-up">
             <div className="p-4 bg-blue-50 border-b flex justify-between items-center">
-              <h2 className="font-semibold text-gray-800">Microphone Access Required</h2>
+              <h2 className="font-semibold text-gray-800">
+                Microphone Access Required
+              </h2>
               <button
                 onClick={() => setShowMicModal(false)}
                 className="text-gray-500 hover:text-gray-700"
@@ -565,14 +582,28 @@ export const DunkinOrderApp: React.FC = () => {
             <div className="p-6">
               <div className="mb-4 text-center">
                 <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-blue-100">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8 text-blue-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                    />
                   </svg>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Microphone Access Unavailable</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Microphone Access Unavailable
+                </h3>
                 <p className="text-gray-600 mb-4">
-                  Voice recognition is not available within the embedded store. 
-                  Please open the assistant in a separate tab to use voice commands.
+                  Voice recognition is not available within the embedded store.
+                  Please open the assistant in a separate tab to use voice
+                  commands.
                 </p>
               </div>
               <div className="flex flex-col gap-3">

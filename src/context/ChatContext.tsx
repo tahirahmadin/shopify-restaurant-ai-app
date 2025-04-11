@@ -35,6 +35,34 @@ interface Message {
   time: string;
   imageUrl?: string;
   queryType: QueryType;
+  cues?: string[];
+  items?: any[];
+}
+
+interface CustomizationModalState {
+  isOpen: boolean;
+  item: {
+    id: number;
+    name: string;
+    price: string;
+    image?: string;
+    customisation?: {
+      categories: {
+        categoryName: string;
+        minQuantity: number;
+        maxQuantity: number;
+        items: {
+          name: string;
+          price: string;
+          _id: string;
+        }[];
+        _id: string;
+      }[];
+      _id: string;
+    };
+    restaurant?: string;
+  } | null;
+  isEditing: boolean;
 }
 
 interface ChatState {
@@ -45,31 +73,7 @@ interface ChatState {
   mode: "chat" | "browse";
   selectedRestaurant: string | null;
   selectedModel: ChatModel;
-  customization: {
-    isOpen: boolean;
-    item: {
-      id: number;
-      name: string;
-      price: string;
-      image?: string;
-      customisation?: {
-        categories: {
-          categoryName: string;
-          minQuantity: number;
-          maxQuantity: number;
-          items: {
-            name: string;
-            price: number;
-            _id: string;
-          }[];
-          _id: string;
-        }[];
-        _id: string;
-      };
-      restaurant?: string;
-    } | null;
-    isEditing: boolean;
-  };
+  customization: CustomizationModalState;
   cart: CartItem[];
   checkout: {
     step: "details" | "payment" | null;
@@ -120,7 +124,11 @@ type ChatAction =
   | { type: "ADD_TO_CART"; payload: CartItem }
   | {
       type: "SET_CUSTOMIZATION_MODAL";
-      payload: { isOpen: boolean; item: ChatState["customization"]["item"] };
+      payload: {
+        isOpen: boolean;
+        item: ChatState["customization"]["item"];
+        isEditing: boolean;
+      };
     }
   | { type: "REMOVE_FROM_CART"; payload: number }
   | { type: "UPDATE_CART_ITEM"; payload: CartItem }
@@ -132,7 +140,12 @@ type ChatAction =
     }
   | { type: "CLEAR_CART" }
   | { type: "RESET_STATE" }
-  | { type: "SET_VARIANT_SELECTION"; payload: ChatState["variantSelection"] };
+  | { type: "SET_VARIANT_SELECTION"; payload: ChatState["variantSelection"] }
+  | { type: "UPDATE_MESSAGE"; payload: { id: number; cues: string[] } }
+  | {
+      type: "OPEN_CUSTOMIZATION_MODAL";
+      payload: { item: any; isEditing: boolean };
+    };
 
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
@@ -252,6 +265,24 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         variantSelection: action.payload,
       };
+    case "UPDATE_MESSAGE":
+      return {
+        ...state,
+        messages: state.messages.map((message) =>
+          message.id === action.payload.id
+            ? { ...message, cues: action.payload.cues }
+            : message
+        ),
+      };
+    case "OPEN_CUSTOMIZATION_MODAL":
+      return {
+        ...state,
+        customization: {
+          isOpen: true,
+          item: action.payload.item,
+          isEditing: action.payload.isEditing,
+        },
+      };
     default:
       return state;
   }
@@ -263,11 +294,12 @@ const initialState: ChatState = {
   error: null,
   currentQueryType: QueryType.GENERAL,
   mode: "chat",
-  selectedModel: ChatModel.OPENAI,
   selectedRestaurant: null,
+  selectedModel: ChatModel.OPENAI,
   customization: {
     isOpen: false,
     item: null,
+    isEditing: false,
   },
   cart: [],
   checkout: {
@@ -328,6 +360,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
 
     updateGreeting();
   }, []);
+
+  const openCustomizationModal = (item: any, isEditing: boolean = false) => {
+    dispatch({
+      type: "OPEN_CUSTOMIZATION_MODAL",
+      payload: { item, isEditing },
+    });
+  };
 
   return (
     <ChatContext.Provider value={{ state, dispatch }}>

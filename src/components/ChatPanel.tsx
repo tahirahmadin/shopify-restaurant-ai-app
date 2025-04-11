@@ -56,7 +56,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   isSpeechSupported = false,
   onSpeechToggle = () => {},
   interimTranscript = "",
-  isInShopifyIframe = false,   
+  isInShopifyIframe = false,
   onOpenStandalone = () => {},
 }) => {
   const { state, dispatch } = useChatContext();
@@ -304,6 +304,22 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
 
   // Use either external or internal image analyzing state
   const showImageAnalyzing = externalImageAnalyzing || isImageAnalyzing;
+
+  // Function to clear bot cues
+  const clearBotCues = () => {
+    const lastBotMessage = state.messages
+      .filter((msg) => msg.isBot)
+      .slice(-1)[0];
+    if (lastBotMessage) {
+      dispatch({
+        type: "UPDATE_MESSAGE",
+        payload: {
+          id: lastBotMessage.id,
+          cues: [],
+        },
+      });
+    }
+  };
 
   return (
     <>
@@ -568,11 +584,15 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
         }
         isLoading={isLoading}
         isSpeechEnabled={isSpeechEnabled}
-        isSpeechSupported={isSpeechSupported && !isInShopifyIframe} 
+        isSpeechSupported={isSpeechSupported && !isInShopifyIframe}
         onSpeechToggle={onSpeechToggle}
         interimTranscript={interimTranscript}
         isInShopifyIframe={isInShopifyIframe}
         onOpenStandalone={onOpenStandalone}
+        botCues={
+          state.messages.filter((msg) => msg.isBot).slice(-1)[0]?.cues || []
+        }
+        onClearBotCues={clearBotCues}
       />
     </>
   );

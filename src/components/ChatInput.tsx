@@ -24,6 +24,8 @@ interface ChatInputProps {
   isSpeechSupported?: boolean;
   onSpeechToggle?: () => void;
   interimTranscript?: string;
+  botCues?: string[];
+  onClearBotCues?: () => void;
 }
 
 import { useFiltersContext } from "../context/FiltersContext";
@@ -42,10 +44,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   isSpeechSupported = false,
   onSpeechToggle = () => {},
   interimTranscript = "",
+  botCues = [],
+  onClearBotCues = () => {},
 }) => {
   const { addresses } = useAuth();
   const { theme } = useFiltersContext();
   const { state: restaurantState } = useRestaurant();
+  const [clickedCues, setClickedCues] = useState<Set<string>>(new Set());
 
   const formRef = useRef<HTMLFormElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -53,7 +58,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const captureInputRef = useRef<HTMLInputElement>(null);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [showImageOptions, setShowImageOptions] = useState(false);
-  const [micPermissionError, setMicPermissionError] = useState<string | null>(null);
+  const [micPermissionError, setMicPermissionError] = useState<string | null>(
+    null
+  );
   const [showMicError, setShowMicError] = useState(false);
 
   // Clear mic error after a few seconds
@@ -130,6 +137,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   const handleQuickAction = (message: string) => {
     setInput(message);
+    setClickedCues((prev) => new Set([...prev, message]));
+    if (botCues.includes(message)) {
+      onClearBotCues();
+    }
     setTimeout(() => {
       if (formRef.current) {
         const syntheticEvent = new SubmitEvent("submit", {
@@ -137,6 +148,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           cancelable: true,
         });
         formRef.current.dispatchEvent(syntheticEvent);
+        setInput("");
       }
     }, 0);
   };
@@ -146,25 +158,43 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     try {
       // Clear any previous error
       setMicPermissionError(null);
-      
+
       // Call the provided speech toggle function
       onSpeechToggle();
-      
+
       // Listen for errors that might happen during speech recognition
-      window.addEventListener('speechrecognitionerror', (e: any) => {
-        console.log("Speech recognition error caught:", e);
-        if (e.error === 'not-allowed' || e.error === 'permission-denied') {
-          setMicPermissionError("Please allow microphone access in your browser settings.");
-          setShowMicError(true);
-        }
-      }, { once: true }); // Only listen once
-      
+      window.addEventListener(
+        "speechrecognitionerror",
+        (e: any) => {
+          console.log("Speech recognition error caught:", e);
+          if (e.error === "not-allowed" || e.error === "permission-denied") {
+            setMicPermissionError(
+              "Please allow microphone access in your browser settings."
+            );
+            setShowMicError(true);
+          }
+        },
+        { once: true }
+      ); // Only listen once
     } catch (error) {
       console.error("Error toggling speech recognition:", error);
-      setMicPermissionError("Microphone access failed. Please check browser settings.");
+      setMicPermissionError(
+        "Microphone access failed. Please check browser settings."
+      );
       setShowMicError(true);
     }
   };
+  // Reset clicked cues when input changes
+  useEffect(() => {
+    if (input === "") {
+      setClickedCues(new Set());
+    }
+  }, [input]);
+
+  // Reset clicked cues when bot cues change
+  useEffect(() => {
+    setClickedCues(new Set());
+  }, [botCues]);
 
   return (
     <div
@@ -183,36 +213,66 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           <span>{micPermissionError}</span>
         </div>
       )}
-      
+
       {/* Display interim transcript during speech recognition */}
       {isSpeechEnabled && interimTranscript && (
         <div className="mb-2 px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 italic">
           {interimTranscript}
         </div>
       )}
-      
-      <div className="w-full">
-        {showQuickActions && !input && !isKeyboardOpen && (
-          <div className="grid grid-cols-2 gap-2 mb-1 max-h-[120px] overflow-y-auto">
-            {restaurantState.storeConfig?.cues.map((singleCue, index) => {
-              return (
-                <button
-                  key={index}
-                  onClick={() => handleQuickAction(singleCue.value)}
-                  className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
-                  style={{
-                    backgroundColor: theme.inputButtonBg,
-                    color: theme.inputButtonText,
-                  }}
-                  type="button"
-                >
-                  <span>{singleCue.title}</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
+
+      {/* Cues Section */}
+      {!isKeyboardOpen && (
+        <div className="w-full mb-2">
+          {/* Store config cues - only show when no messages */}
+          {showQuickActions &&
+            restaurantState.storeConfig?.cues &&
+            restaurantState.storeConfig.cues.length > 0 && (
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                {restaurantState.storeConfig.cues.map((singleCue, index) => {
+                  if (clickedCues.has(singleCue.value)) return null;
+                  return (
+                    <button
+                      key={`store-${index}`}
+                      onClick={() => handleQuickAction(singleCue.value)}
+                      className="flex items-center gap-2 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm justify-center"
+                      style={{
+                        backgroundColor: theme.inputButtonBg,
+                        color: theme.inputButtonText,
+                      }}
+                      type="button"
+                    >
+                      <span>{singleCue.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+          {/* Bot response cues - show whenever available */}
+          {botCues.length > 0 && (
+            <div className="flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              {botCues.map((cue, index) => {
+                if (clickedCues.has(cue)) return null;
+                return (
+                  <button
+                    key={`bot-${index}`}
+                    onClick={() => handleQuickAction(cue)}
+                    className="flex-shrink-0 px-4 py-1 bg-white/90 rounded-full hover:bg-white transition-colors text-xs text-gray-600 shadow-sm"
+                    style={{
+                      backgroundColor: theme.inputButtonBg,
+                      color: theme.inputButtonText,
+                    }}
+                    type="button"
+                  >
+                    <span>{cue}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       <form
         ref={formRef}
@@ -233,7 +293,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           className="flex-1 bg-transparent focus:outline-none text-[16px] min-h-[40px] transition-colors duration-300"
           style={{
             color: theme.text,
-            "::placeholder": { color: `${theme.text}60` },
           }}
         />
 

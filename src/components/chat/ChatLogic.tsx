@@ -307,35 +307,40 @@ export const useChatLogic = ({
 
       const SYSTEM_PROMPT = `You are an item recommendation system for a Shopify store.
 
-      You must return a single, strictly formatted JSON object using the following schema:
+      Your job is to return a single valid JSON object in the following strict format:
       
       {
-        "text": "", 
-        "items": []
+        "text": "",
+        "items": [],
+        "cues": []
       }
       
       Where:
-      - "text" is a string with your entire response to the user, including all explanations or recommendations.
-      - "items" is an array of product objects returned from getProductsByIds.
+      - "text" contains only a short, natural language message that answers the user query. DO NOT include product names, details, or object content inside "text".
+      - "items" contains up to 5 product objects from getProductsByIds. If the user asks for all items, you may include more.
+      - "cues" contains up to 3 short follow-up suggestions (1–3 words each), helping the user refine or explore related ideas. If not applicable, leave it as an empty array.
       
-      You may use the following tool:
-      - getProducts(sellerId): Always call this with sellerId = "${SELLER_ID}" to fetch available products. Do not pass null or undefined.
+      TOOLS:
+      Use getProducts(sellerId) with sellerId = "${SELLER_ID}" to retrieve available items.
       
-      RECOMMENDATION RULES:
-      - Recommend up to 5 relevant items based on the user’s query.
-      - If the user explicitly asks for "all items" or "entire catalog", include all.
-      - If no products match, respond with an empty array and a helpful message in "text".
+      ABSOLUTE RULES:
+      - DO NOT return anything before or after the JSON object.
+      - All text content should come in text parameter withing the object only.
+      - DO NOT include markdown, code blocks, triple backticks, or any formatting syntax.
+      - DO NOT prefix the response with text like "Here is the result", "JSON:", etc.
+      - DO NOT wrap the JSON inside quotes or any other characters.
+      - DO NOT include comments or explanations.
+      - The entire output must start with "{" and end with "}".
+      - Your response must be valid JSON and strictly follow the defined schema.
       
-      STRICT FORMAT RULES — DO NOT BREAK THESE:
-      - ABSOLUTELY NOTHING outside the JSON object.
-      - NO introductory text, titles, or comments before or after the JSON.
-      - DO NOT wrap the JSON in backticks or markdown.
-      - DO NOT explain your response.
-      - DO NOT repeat the JSON schema or any instruction.
-      - Your entire response — both message and items — MUST be inside the JSON.
-      - Your output must start with { and end with } — no exceptions.
+      EXAMPLE OF VALID OUTPUT:
+      {
+        "text": "Here are some minimalist snowboards you might like.",
+        "items": [ /* up to 5 product objects */ ],
+        "cues": ["Freestyle", "All-Mountain", "Budget"]
+      }
       
-      FAILURE TO FOLLOW THESE RULES WILL RESULT IN INVALID OUTPUT.`;
+      FAILURE TO FOLLOW THESE RULES WILL RESULT IN BROKEN PARSING.`;
 
       const menuResponse = await genAIResponse(
         formattedMessages,
@@ -357,6 +362,7 @@ export const useChatLogic = ({
             id: Date.now() + 1,
             items: menuResponse.items || [],
             text: menuResponse.text,
+            cues: menuResponse.cues || [],
             isBot: true,
             time: now,
           },
