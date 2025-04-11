@@ -1,6 +1,7 @@
 import React from "react";
 import { X, ArrowRight } from "lucide-react";
 import { useFiltersContext } from "../context/FiltersContext";
+import { useRestaurant } from "../context/RestaurantContext";
 
 interface StyleChangeModalProps {
   isOpen: boolean;
@@ -20,6 +21,15 @@ export const StyleChangeModal: React.FC<StyleChangeModalProps> = ({
   if (!isOpen) return null;
 
   const { theme } = useFiltersContext();
+  const { state: restaurantState } = useRestaurant();
+
+  // Find the personality details for current and new styles
+  const currentPersonality = restaurantState.storeConfig?.personalities?.find(
+    (p) => p.name === currentStyle || p.displayName === currentStyle
+  );
+  const newPersonality = restaurantState.storeConfig?.personalities?.find(
+    (p) => p.name === newStyle || p.displayName === newStyle
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 mt-[-50px]">
@@ -52,16 +62,8 @@ export const StyleChangeModal: React.FC<StyleChangeModalProps> = ({
             <div className="flex-1 text-center relative">
               <div className="w-20 h-20 mx-auto mb-3 rounded-full overflow-hidden ring-4 ring-white shadow-lg">
                 <img
-                  src={
-                    currentStyle === "Gobbl"
-                      ? "https://gobbl-bucket.s3.ap-south-1.amazonaws.com/tapAssets/gobbl_coin.webp"
-                      : currentStyle === "Trump"
-                        ? "https://images.unsplash.com/photo-1580128660010-fd027e1e587a?q=80&w=1964&auto=format&fit=crop"
-                        : currentStyle === "CZ Binance"
-                          ? "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSnI1JQg6mXsN66qOzLiX2n5IOgWYBXi01rzQeEQto8EiGsWnZUCvv6jN3A5KrBIhVh2VvRfI6_KbtkLRin1G0Bsg"
-                          : "https://img.delicious.com.au/D-EUAdrh/w759-h506-cfill/del/2017/06/gordon-ramsay-47340-2.jpg"
-                  }
-                  alt={currentStyle}
+                  src={currentPersonality?.image}
+                  alt={currentPersonality?.displayName}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -69,7 +71,7 @@ export const StyleChangeModal: React.FC<StyleChangeModalProps> = ({
                 className="text-sm font-semibold"
                 style={{ color: theme.primary }}
               >
-                {currentStyle}
+                {currentPersonality?.displayName}
               </p>
               <p className="text-xs" style={{ color: theme.modalMainText }}>
                 Current Style
@@ -87,16 +89,8 @@ export const StyleChangeModal: React.FC<StyleChangeModalProps> = ({
             <div className="flex-1 text-center relative">
               <div className="w-20 h-20 mx-auto mb-3 rounded-full overflow-hidden ring-4 ring-white shadow-lg">
                 <img
-                  src={
-                    newStyle === "Gobbl"
-                      ? "https://gobbl-bucket.s3.ap-south-1.amazonaws.com/tapAssets/gobbl_coin.webp"
-                      : newStyle === "Trump"
-                        ? "https://images.unsplash.com/photo-1580128660010-fd027e1e587a?q=80&w=1964&auto=format&fit=crop"
-                        : newStyle === "CZ Binance"
-                          ? "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSnI1JQg6mXsN66qOzLiX2n5IOgWYBXi01rzQeEQto8EiGsWnZUCvv6jN3A5KrBIhVh2VvRfI6_KbtkLRin1G0Bsg"
-                          : "https://img.delicious.com.au/D-EUAdrh/w759-h506-cfill/del/2017/06/gordon-ramsay-47340-2.jpg"
-                  }
-                  alt={newStyle}
+                  src={newPersonality?.image}
+                  alt={newPersonality?.displayName}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -104,7 +98,7 @@ export const StyleChangeModal: React.FC<StyleChangeModalProps> = ({
                 className="text-sm font-semibold"
                 style={{ color: theme.primary }}
               >
-                {newStyle}
+                {newPersonality?.displayName}
               </p>
               <p
                 className="text-xs text-gray-500"

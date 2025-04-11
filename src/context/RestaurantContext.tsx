@@ -17,6 +17,11 @@ interface RestaurantState {
     image: string;
     cues: any[];
     theme: string;
+    personalities: {
+      displayName: string;
+      name: string;
+      image: string;
+    }[];
     loaderTexts: any[];
   } | null;
 }
@@ -36,6 +41,11 @@ type RestaurantAction =
         logo: string;
         cues: any[];
         themeColor: string;
+        personalities: {
+          displayName: string;
+          name: string;
+          image: string;
+        }[];
         loaders: any[];
       };
     };
@@ -53,8 +63,16 @@ const initialState: RestaurantState = {
     image: "",
     cues: [],
     theme: "#000000",
+    personalities: [],
     loaderTexts: [],
   },
+};
+
+let defaultStyle = {
+  displayName: "Gobbl",
+  name: "GOBBL",
+  image:
+    "https://gobbl-bucket.s3.ap-south-1.amazonaws.com/tapAssets/gobbl_coin.webp",
 };
 
 const restaurantReducer = (
@@ -84,7 +102,13 @@ const restaurantReducer = (
     case "SET_STORE_CONFIG":
       return {
         ...state,
-        storeConfig: action.payload,
+        storeConfig: {
+          ...action.payload,
+          personalities: [
+            defaultStyle,
+            ...(action.payload.personalities || []),
+          ],
+        },
       };
 
     case "RESET_STATE":

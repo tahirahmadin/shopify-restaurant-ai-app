@@ -1,5 +1,6 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
+import { submitTokenConsumption } from "./serverActions";
 
 import getTools from "./ai-tools";
 
@@ -13,7 +14,11 @@ export interface Message {
   content: string;
 }
 
-export const genAIResponse = async (messages: any, SYSTEM_PROMPT: string) => {
+export const genAIResponse = async (
+  messages: any,
+  SYSTEM_PROMPT: string,
+  sellerId: string
+) => {
   const tools = await getTools();
 
   try {
@@ -24,8 +29,15 @@ export const genAIResponse = async (messages: any, SYSTEM_PROMPT: string) => {
       maxSteps: 20,
       tools,
     });
-    let output = await result.then((res) => {
+
+    let output = await result.then(async (res) => {
       try {
+        // Log token consumption
+        if (res.usage) {
+          const tokens = res.usage.totalTokens;
+          await submitTokenConsumption(sellerId, tokens);
+        }
+
         return JSON.parse(res.text);
       } catch (e) {
         return { text: res.text, items: [] };

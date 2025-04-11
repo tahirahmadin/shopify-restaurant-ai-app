@@ -337,7 +337,7 @@ export const useChatLogic = ({
       }
       
       Where:
-      - "text" contains only a short, natural language message that answers the user query. DO NOT include product names, details, or object content inside "text".
+      - "text" contains only a short, natural language message in style of ${selectedStyle.displayName} that answers the user query. DO NOT include product names, details, or object content inside "text".
       - "items" contains up to 5 product objects from getProductsByIds. If the user asks for all items, you may include more.
       - "cues" contains up to 3 short follow-up suggestions (1–3 words each), helping the user refine or explore related ideas. If not applicable, leave it as an empty array.
       
@@ -363,44 +363,49 @@ export const useChatLogic = ({
       
       FAILURE TO FOLLOW THESE RULES WILL RESULT IN BROKEN PARSING.`;
 
-      const menuResponse = await genAIResponse(
-        formattedMessages,
-        SYSTEM_PROMPT
-      );
+      if (SELLER_ID) {
+        const menuResponse = await genAIResponse(
+          formattedMessages,
+          SYSTEM_PROMPT,
+          SELLER_ID
+        );
 
-      if (menuResponse.items?.length > 0) {
-        let itemIds = menuResponse.items.map((item) => item.id);
-        let res = await getProductsByIds(itemIds, SELLER_ID);
-        menuResponse.items = res;
-      }
-      console.log("menuResponse");
-      console.log(menuResponse);
-
-      if (menuResponse) {
-        dispatch({
-          type: "ADD_MESSAGE",
-          payload: {
-            id: Date.now() + 1,
-            items: menuResponse.items || [],
-            text: menuResponse.text,
-            cues: menuResponse.cues || [],
-            isBot: true,
-            time: now,
-          },
-        });
-
-        // Submit chat logs with consistent session IDs
-        if (sessionIds) {
-          await submitUserChatLogs(
-            restaurantState.activeRestroId,
-            sessionIds.userId,
-            sessionIds.sessionId,
-            [
-              { role: "user", content: latestMessage.text },
-              { role: "assistant", content: menuResponse.text },
-            ]
-          );
+        if (menuResponse.items?.length > 0) {
+          let itemIds = menuResponse.items.map((item) => item.id);
+          let res = await getProductsByIds(itemIds, SELLER_ID);
+          menuResponse.items = res;
         }
+        console.log("menuResponse");
+        console.log(menuResponse);
+
+        if (menuResponse) {
+          dispatch({
+            type: "ADD_MESSAGE",
+            payload: {
+              id: Date.now() + 1,
+              items: menuResponse.items || [],
+              text: menuResponse.text,
+              cues: menuResponse.cues || [],
+              isBot: true,
+              time: now,
+            },
+          });
+
+          // Submit chat logs with consistent session IDs
+          if (sessionIds) {
+            await submitUserChatLogs(
+              restaurantState.activeRestroId,
+              sessionIds.userId,
+              sessionIds.sessionId,
+              [
+                { role: "user", content: latestMessage.text },
+                { role: "assistant", content: menuResponse.text },
+              ]
+            );
+          }
+        }
+      } else {
+        throw new Error("Seller ID not found");
       }
     } catch (error) {
       throw error;

@@ -223,6 +223,33 @@ export const submitUserChatLogs = async (
   }
 };
 
+//4. USER:: Update User Addresses
+export const submitTokenConsumption = async (
+  sellerId: string,
+  tokens: number
+): Promise<{ error: boolean; result: any }> => {
+  try {
+    let url: string = `https://aggregator.gobbl.ai/api/shopify/addTokenConsumption`;
+
+    // Encrypted data
+    let data = { sellerId, tokens };
+
+    let response: AxiosResponse = await axios
+      .post(url, data)
+      .then((res: AxiosResponse) => res)
+      .catch((err: any) => err.response);
+
+    if (response.data && !response.data.error) {
+      return { error: false, result: response.data.result };
+    } else {
+      return { error: true, result: response.data.result };
+    }
+  } catch (err) {
+    console.error("Update addresses error:", err);
+    return { error: true, result: null };
+  }
+};
+
 // Get all online restaurants
 export const getAllRestaurants = async (
   coordinates?: { lat: number; lng: number } | null,

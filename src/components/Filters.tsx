@@ -4,18 +4,32 @@ import { useChatContext } from "../context/ChatContext";
 import { useAuth } from "../context/AuthContext";
 import { useFiltersContext } from "../context/FiltersContext";
 import { StyleChangeModal } from "./StyleChangeModal";
+import { getStoreConfigData } from "../actions/serverActions";
+import { useRestaurant } from "../context/RestaurantContext";
 
 export const Filters: React.FC = () => {
   const { theme, selectedStyle, setSelectedStyle } = useFiltersContext();
-
+  const { state: restaurantState } = useRestaurant();
   const { state, dispatch } = useChatContext();
-
   const { addresses } = useAuth();
   const [selectedAddressIndex, setSelectedAddressIndex] = useState<number>(0);
   const [isStyleDropdownOpen, setIsStyleDropdownOpen] = useState(false);
-
   const [isStyleChangeModalOpen, setIsStyleChangeModalOpen] = useState(false);
   const [pendingStyle, setPendingStyle] = useState<any>(null);
+  const [conversationStyles, setConversationStyles] = useState<any[]>([]);
+
+  // Fetch conversation styles from API
+  useEffect(() => {
+    let personalities = restaurantState?.storeConfig?.personalities || [];
+
+    if (personalities) {
+      setConversationStyles(personalities);
+      // Set initial selected style if not already set
+      if (!selectedStyle && personalities.length > 0) {
+        setSelectedStyle(personalities[0]);
+      }
+    }
+  }, [restaurantState.storeConfig, selectedStyle, setSelectedStyle]);
 
   // Set initial selected address to first address if available
   useEffect(() => {
@@ -23,29 +37,6 @@ export const Filters: React.FC = () => {
       setSelectedAddressIndex(0);
     }
   }, [addresses]);
-
-  const conversationStyles = [
-    {
-      name: "Gobbl",
-      image:
-        "https://gobbl-bucket.s3.ap-south-1.amazonaws.com/tapAssets/gobbl_coin.webp",
-    },
-    {
-      name: "CZ Binance",
-      image:
-        "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSnI1JQg6mXsN66qOzLiX2n5IOgWYBXi01rzQeEQto8EiGsWnZUCvv6jN3A5KrBIhVh2VvRfI6_KbtkLRin1G0Bsg",
-    },
-    {
-      name: "Trump",
-      image:
-        "https://images.unsplash.com/photo-1580128660010-fd027e1e587a?q=80&w=1964&auto=format&fit=crop",
-    },
-    {
-      name: "Gordon Ramsay",
-      image:
-        "https://img.delicious.com.au/D-EUAdrh/w759-h506-cfill/del/2017/06/gordon-ramsay-47340-2.jpg",
-    },
-  ];
 
   const handleStyleSelect = (style: any) => {
     setPendingStyle(style);
@@ -74,11 +65,11 @@ export const Filters: React.FC = () => {
             style={{ backgroundColor: theme.cardBg }}
           >
             <img
-              src={selectedStyle.image}
-              alt={selectedStyle.name}
+              src={selectedStyle?.image}
+              alt={selectedStyle?.name}
               className="w-5 h-5 rounded-full object-cover"
             />
-            <span>{selectedStyle.name}</span>
+            <span>{selectedStyle?.name}</span>
             <ChevronDown className="w-3 h-3" />
           </button>
 
@@ -94,7 +85,7 @@ export const Filters: React.FC = () => {
                 <button
                   key={style.name}
                   onClick={() => {
-                    if (style.name !== selectedStyle.name) {
+                    if (style.name !== selectedStyle?.name) {
                       handleStyleSelect(style);
                     } else {
                       setIsStyleDropdownOpen(false);
@@ -113,7 +104,7 @@ export const Filters: React.FC = () => {
                       color: theme.filtersText,
                     }}
                   >
-                    {style.name}
+                    {style.displayName || style.name}
                   </span>
                 </button>
               ))}
@@ -122,8 +113,6 @@ export const Filters: React.FC = () => {
         </div>
       </div>
 
-      {/* Filters Section */}
-
       <StyleChangeModal
         isOpen={isStyleChangeModalOpen}
         onClose={() => {
@@ -131,7 +120,7 @@ export const Filters: React.FC = () => {
           setPendingStyle(null);
         }}
         onConfirm={handleStyleChangeConfirm}
-        currentStyle={selectedStyle.name}
+        currentStyle={selectedStyle?.name || ""}
         newStyle={pendingStyle?.name || ""}
       />
     </div>

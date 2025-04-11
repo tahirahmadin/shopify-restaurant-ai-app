@@ -98,7 +98,6 @@ export const DunkinOrderApp: React.FC = () => {
         "https://www.curatehome.me/cdn/shop/files/5_300x.png?v=1684928640";
 
       const accessToken = accessTokenParam;
-      // const accessToken = "";
 
       if (accessToken) {
         let sellerId = await getSellerIdViaAccessToken(accessToken);
