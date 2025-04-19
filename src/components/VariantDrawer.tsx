@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Plus, ChevronRight, ShoppingCart } from "lucide-react";
+import { X, ShoppingCart } from "lucide-react";
 import { useFiltersContext } from "../context/FiltersContext";
 import { useRestaurant } from "../context/RestaurantContext";
 import { useChatContext } from "../context/ChatContext";
@@ -21,18 +21,7 @@ interface VariantDrawerProps {
       description?: string;
     }>;
   } | null;
-  onSelectVariant: (variant: {
-    id: number;
-    name: string;
-    price: string;
-    image?: string;
-    title?: string;
-    description?: string;
-    parentItem?: {
-      id: number;
-      name: string;
-    };
-  }) => void;
+  onSelectVariant?: (variant: any) => void;
 }
 
 export const VariantDrawer: React.FC<VariantDrawerProps> = ({
@@ -43,7 +32,8 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
 }) => {
   const { theme } = useFiltersContext();
   const { state: restaurantState } = useRestaurant();
-  const { dispatch: chatDispatch } = useChatContext();
+  // Direct access to chat context to add to cart
+  const { dispatch } = useChatContext();
   const [selectedVariant, setSelectedVariant] = useState<{
     id: number;
     name: string;
@@ -64,36 +54,79 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
     description?: string;
   }) => {
     setSelectedVariant(variant);
+    console.log("Selected variant:", variant); // Debug log
   };
 
   const handleAddToCart = () => {
     if (selectedVariant) {
-      // Add parent item information to the variant
-      const variantWithParent = {
-        ...selectedVariant,
-        // Create a unique ID by combining parent and variant IDs
-        id: parseInt(`${item.id}${selectedVariant.id}`),
-        // Include a formatted name that shows both parent item and variant
-        name: `${item.name} - ${selectedVariant.title || selectedVariant.name}`,
-        // Use the variant's image if available, otherwise use the parent item's image
+      // Create a unique ID for the variant
+      const variantId = parseInt(`${item.id}${selectedVariant.id}`);
+      
+      // Format the name to include both the item and variant
+      const variantName = `${item.name} - ${selectedVariant.title || selectedVariant.name}`;
+      
+      // Debug logs
+      console.log("Adding to cart:", {
+        id: variantId,
+        name: variantName,
+        price: selectedVariant.price,
         image: selectedVariant.image || item.image,
-        // Store parent item information for reference
         parentItem: {
           id: item.id,
           name: item.name
         }
-      };
+      });
       
-      chatDispatch({
-        type: "SET_SELECTED_VARIANT_ITEM",
+      // Directly add to cart
+      dispatch({
+        type: "ADD_TO_CART",
         payload: {
-          ...variantWithParent,
-          quantity: 1
+          id: variantId,
+          name: variantName,
+          price: selectedVariant.price,
+          image: selectedVariant.image || item.image || "https://via.placeholder.com/400",
+          quantity: 1,
+          parentItem: {
+            id: item.id,
+            name: item.name
+          }
         }
       });
       
-      // Call the parent component's handler
-      onSelectVariant(variantWithParent);
+      // Also set the selected variant item for reference by other components
+      dispatch({
+        type: "SET_SELECTED_VARIANT_ITEM",
+        payload: {
+          id: variantId,
+          name: variantName,
+          price: selectedVariant.price,
+          image: selectedVariant.image || item.image,
+          title: selectedVariant.title,
+          description: selectedVariant.description,
+          parentItem: {
+            id: item.id,
+            name: item.name
+          }
+        }
+      });
+      
+      // Call the parent component's handler if provided
+      if (onSelectVariant) {
+        onSelectVariant({
+          id: variantId,
+          name: variantName,
+          price: selectedVariant.price,
+          image: selectedVariant.image || item.image,
+          parentItem: {
+            id: item.id,
+            name: item.name
+          }
+        });
+      }
+      
+      // Show a success message or notification
+      alert(`Added ${variantName} to cart`);
+      
       onClose();
     }
   };
@@ -137,7 +170,7 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
                 {item.name}
               </h3>
               <p className="text-lg font-bold text-primary mt-1">
-                {item.price} USD
+                {item.price} AED
               </p>
             </div>
 
@@ -166,7 +199,7 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
                   >
                     <h4 className="font-small text-center">{variant.title}</h4>
                     <p className="text-sm font-medium text-primary">
-                      {variant.price} USD
+                      {variant.price} AED
                     </p>
                   </button>
                 ))}
