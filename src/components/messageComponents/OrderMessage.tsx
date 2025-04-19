@@ -45,18 +45,36 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
   };
 
   const handleProceedToCart = () => {
+    console.log("Proceed to Cart clicked");
+    
     try {
+      if (state.selectedVariantItem) {
+        console.log("Found variant to send to Shopify:", state.selectedVariantItem);
+        
+        if (typeof window !== "undefined" && window.parent) {
+          window.parent.postMessage(
+            {
+              type: "ADD_TO_CART",
+              payload: {
+                id: state.selectedVariantItem.id,
+                quantity: 1,
+              },
+            },
+            "*"
+          );
+        }
+        
+        dispatch({
+          type: "SET_SELECTED_VARIANT_ITEM",
+          payload: null,
+        });
+      }
+      
       if (typeof window !== "undefined" && window.parent) {
         window.parent.postMessage({ action: "OPEN_CART" }, "*");
       }
-      
-      // Set the cart as expanded in our UI
-      dispatch({
-        type: "SET_CART_EXPANDED",
-        payload: true,
-      });
     } catch (error) {
-      console.error("Error handling proceed to cart:", error);
+      console.error("Error in handleProceedToCart:", error);
     }
   };
 
