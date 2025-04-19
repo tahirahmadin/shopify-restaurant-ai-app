@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X, Plus, ChevronRight, ShoppingCart } from "lucide-react";
 import { useFiltersContext } from "../context/FiltersContext";
 import { useRestaurant } from "../context/RestaurantContext";
+import { useChatContext } from "../context/ChatContext";
 
 interface VariantDrawerProps {
   isOpen: boolean;
@@ -42,6 +43,7 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
 }) => {
   const { theme } = useFiltersContext();
   const { state: restaurantState } = useRestaurant();
+  const { dispatch: chatDispatch } = useChatContext();
   const [selectedVariant, setSelectedVariant] = useState<{
     id: number;
     name: string;
@@ -82,6 +84,15 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
         }
       };
       
+      chatDispatch({
+        type: "SET_SELECTED_VARIANT_ITEM",
+        payload: {
+          ...variantWithParent,
+          quantity: 1
+        }
+      });
+      
+      // Call the parent component's handler
       onSelectVariant(variantWithParent);
       onClose();
     }
@@ -126,7 +137,7 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
                 {item.name}
               </h3>
               <p className="text-lg font-bold text-primary mt-1">
-                {item.price} AED
+                {item.price} USD
               </p>
             </div>
 
@@ -155,7 +166,7 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
                   >
                     <h4 className="font-small text-center">{variant.title}</h4>
                     <p className="text-sm font-medium text-primary">
-                      {variant.price} AED
+                      {variant.price} USD
                     </p>
                   </button>
                 ))}
