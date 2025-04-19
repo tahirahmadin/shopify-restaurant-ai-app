@@ -58,7 +58,7 @@ export const CartSummary: React.FC = () => {
     if (newQuantity <= 0) {
       dispatch({ type: "REMOVE_FROM_CART", payload: itemId });
       window.parent.postMessage(
-        { type: "REMOVE_FROM_CART", payload: { id: itemId } },
+        { type: "REMOVE_FROM_CART", payload: { id: itemId, quantity: item.quantity } },
         "*"
       );
     } else {
@@ -74,7 +74,7 @@ export const CartSummary: React.FC = () => {
         );
       } else {
         window.parent.postMessage(
-          { type: "REMOVE_FROM_CART", payload: { id: itemId } },
+          { type: "REMOVE_FROM_CART", payload: { id: itemId, quantity: -change } },
           "*"
         );
       }
