@@ -124,7 +124,7 @@ export class GreetingService {
       return response.data.choices[0].message.content.trim();
     } catch (error) {
       console.error("Error generating greeting:", error);
-      return "Hi! Looking to decorate your home. Let me know what you're looking for?";
+      return "Hi there! How can I help you today? Just let me know what you're looking for.";
     }
   }
 
@@ -135,10 +135,10 @@ export class GreetingService {
       // const occasions = await this.getSpecialOccasions(location.country);
 
       // return await this.generateGreeting(location, weather, occasions);
-      return "Hi! Looking to decorate your home. Let me know what you're looking for?";
+      return "Hi there! How can I help you today? Just let me know what you're looking for.";
     } catch (error) {
       console.error("Error in greeting service:", error);
-      return "Hi! Looking to decorate your home. Let me know what you're looking for?";
+      return "Hi there! How can I help you today? Just let me know what you're looking for.";
     }
   }
 }
