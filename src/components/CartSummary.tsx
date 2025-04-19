@@ -51,16 +51,25 @@ export const CartSummary: React.FC = () => {
     image: string
   ) => {
     const item = state.cart.find((i) => i.id === itemId);
-    if (item) {
-      const newQuantity = item.quantity + change;
-      if (newQuantity <= 0) {
-        dispatch({ type: "REMOVE_FROM_CART", payload: itemId });
-      } else {
-        dispatch({
-          type: "UPDATE_CART_ITEM",
-          payload: { id: itemId, name, price, quantity: newQuantity, image },
-        });
-      }
+    if (!item) return;
+
+    const newQuantity = item.quantity + change;
+
+    if (newQuantity <= 0) {
+      dispatch({ type: "REMOVE_FROM_CART", payload: itemId });
+      window.parent.postMessage(
+        { type: "REMOVE_FROM_CART", payload: { id: itemId } },
+        "*"
+      );
+    } else {
+      dispatch({
+        type: "UPDATE_CART_ITEM",
+        payload: { id: itemId, name, price, quantity: newQuantity, image },
+      });
+      window.parent.postMessage(
+        { type: "UPDATE_CART_ITEM", payload: { id: itemId, quantity: newQuantity } },
+        "*"
+      );
     }
   };
 

@@ -42,10 +42,11 @@ export const ChatMenuItem: React.FC<MenuItemProps> = ({
 
   const handleCartAction = () => {
     if (isInCart) {
-      dispatch({
-        type: "REMOVE_FROM_CART",
-        payload: id,
-      });
+      dispatch({ type: "REMOVE_FROM_CART", payload: id });
+      window.parent.postMessage(
+        { type: "REMOVE_FROM_CART", payload: { id } },
+        "*"
+      );
       return;
     }
 

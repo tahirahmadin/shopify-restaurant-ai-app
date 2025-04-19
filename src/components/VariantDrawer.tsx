@@ -54,7 +54,6 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
     description?: string;
   }) => {
     setSelectedVariant(variant);
-    console.log("Selected variant:", variant);
   };
 
   const handleAddToCart = () => {
