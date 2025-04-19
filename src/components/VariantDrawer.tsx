@@ -92,6 +92,17 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
           }
         }
       });
+
+      window.parent.postMessage(
+        {
+          type: "ADD_TO_CART",
+          payload: {
+            id: variantId,
+            quantity: 1,
+          },
+        },
+        "*"
+      );
       
       // Also set the selected variant item for reference by other components
       dispatch({

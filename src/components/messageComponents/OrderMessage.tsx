@@ -10,7 +10,7 @@ interface OrderMessageProps {
 }
 
 export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
-  const { dispatch } = useChatContext();
+  const { dispatch, state } = useChatContext();
   const { state: restaurantState } = useRestaurant();
   const { theme } = useFiltersContext();
 
@@ -43,7 +43,76 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
       },
     });
   };
-  
+
+  const handleProceedToCart = () => {
+    try {
+      // Check if there's a selected variant item in the context
+      if (state.selectedVariantItem) {
+        console.log("Found variant item to add to cart:", state.selectedVariantItem);
+        
+        // First add to our internal cart
+        const existingItem = state.cart.find(
+          (item) => item.id === state.selectedVariantItem?.id
+        );
+
+        if (existingItem) {
+          dispatch({
+            type: "UPDATE_CART_ITEM",
+            payload: {
+              ...existingItem,
+              quantity: existingItem.quantity + 1,
+            },
+          });
+        } else {
+          dispatch({
+            type: "ADD_TO_CART",
+            payload: {
+              id: state.selectedVariantItem.id,
+              name: state.selectedVariantItem.name,
+              price: state.selectedVariantItem.price,
+              image: state.selectedVariantItem.image || "",
+              quantity: 1,
+              parentItem: state.selectedVariantItem.parentItem,
+            },
+          });
+        }
+        
+        // Send the variant to Shopify using the same message format as VariantDrawer
+        if (typeof window !== "undefined" && window.parent) {
+          window.parent.postMessage(
+            {
+              type: "ADD_TO_CART",
+              payload: {
+                id: state.selectedVariantItem.id,
+                quantity: 1,
+              },
+            },
+            "*"
+          );
+        }
+        
+        // Clear the selected variant
+        dispatch({
+          type: "SET_SELECTED_VARIANT_ITEM",
+          payload: null,
+        });
+      }
+      
+      // Set the cart as expanded
+      dispatch({
+        type: "SET_CART_EXPANDED",
+        payload: true,
+      });
+      
+      // Then send the open cart message
+      if (typeof window !== "undefined" && window.parent) {
+        window.parent.postMessage({ action: "OPEN_CART" }, "*");
+      }
+    } catch (error) {
+      console.error("Error handling proceed to cart:", error);
+    }
+  };
+
   try {
     const parsedContent = JSON.parse(message.text);
     if (parsedContent.orderSummary) {
@@ -55,7 +124,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
         >
           <div className="flex justify-between items-center">
             <h3 className="font-semibold ">Order Summary</h3>
-            <span className="text-sm">{restaurant}</span>
+            {/* <span className="text-sm">{restaurant}</span> */}
           </div>
 
           <div className="space-y-2">
@@ -113,9 +182,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
               )}
               {restaurantState.cashMode && (
                 <button
-                  onClick={() => {
-                    window.parent.postMessage({ action: "OPEN_CART" }, "*");
-                  }}
+                  onClick={handleProceedToCart}
                   style={{
                     backgroundColor: theme.chatBubbleBg,
                     color: theme.chatBubbleText,
