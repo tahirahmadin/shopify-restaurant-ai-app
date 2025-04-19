@@ -326,3 +326,4 @@ export const CartSummary: React.FC = () => {
       </div>
     </div>
   );
+};
