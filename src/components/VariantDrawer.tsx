@@ -27,6 +27,10 @@ interface VariantDrawerProps {
     image?: string;
     title?: string;
     description?: string;
+    parentItem?: {
+      id: number;
+      name: string;
+    };
   }) => void;
 }
 
@@ -62,7 +66,23 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
 
   const handleAddToCart = () => {
     if (selectedVariant) {
-      onSelectVariant(selectedVariant);
+      // Add parent item information to the variant
+      const variantWithParent = {
+        ...selectedVariant,
+        // Create a unique ID by combining parent and variant IDs
+        id: parseInt(`${item.id}${selectedVariant.id}`),
+        // Include a formatted name that shows both parent item and variant
+        name: `${item.name} - ${selectedVariant.title || selectedVariant.name}`,
+        // Use the variant's image if available, otherwise use the parent item's image
+        image: selectedVariant.image || item.image,
+        // Store parent item information for reference
+        parentItem: {
+          id: item.id,
+          name: item.name
+        }
+      };
+      
+      onSelectVariant(variantWithParent);
       onClose();
     }
   };

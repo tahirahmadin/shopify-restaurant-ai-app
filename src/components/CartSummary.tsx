@@ -142,7 +142,7 @@ export const CartSummary: React.FC = () => {
 
         {isExpanded && (
           <div
-            className=" rounded-lg shadow-xl w-full overflow-hidden animate-slide-up"
+            className="rounded-lg shadow-xl w-full overflow-hidden animate-slide-up"
             style={{ backgroundColor: theme.modalBg }}
           >
             <div
@@ -162,9 +162,10 @@ export const CartSummary: React.FC = () => {
               />
             </div>
             <div className="max-h-64 overflow-y-auto">
-              {console.log("state.cart")}
-              {console.log(state.cart)}
               {state.cart.map((item) => {
+                // Check if this is a variant item by looking for parentItem property
+                const isVariant = item.parentItem !== undefined;
+                
                 return (
                   <div
                     key={item.id}
@@ -184,6 +185,19 @@ export const CartSummary: React.FC = () => {
                       >
                         {item.name}
                         <div className="mt-0.5">
+                          {/* Display variant info if this is a variant */}
+                          {isVariant && (
+                            <div className="text-[10px] text-gray-500">
+                              <span className="font-semibold text-gray-500">
+                                Variant:
+                              </span>{" "}
+                              {item.name.includes(" - ") ? 
+                                item.name.split(" - ")[1] : 
+                                "Selected option"}
+                            </div>
+                          )}
+                          
+                          {/* Display customizations if they exist */}
                           {item.customizations?.map((customization, index) => (
                             <div
                               key={index}
@@ -205,6 +219,7 @@ export const CartSummary: React.FC = () => {
                               )}
                             </div>
                           ))}
+                          
                           {/* Render the Edit button if customizations exist */}
                           {item.customizations &&
                             item.customizations.length > 0 && (
@@ -246,7 +261,7 @@ export const CartSummary: React.FC = () => {
                             item.image
                           )
                         }
-                        className={`p-1  rounded-full`}
+                        className={`p-1 rounded-full`}
                         style={{
                           backgroundColor: theme.modalBg,
                           ":hover": { backgroundColor: theme.modalBgLight },
@@ -286,15 +301,15 @@ export const CartSummary: React.FC = () => {
               })}
             </div>
             <div
-              className="p-4  border-t"
+              className="p-4 border-t"
               style={{
                 backgroundColor: theme.modalBg,
                 color: theme.modalMainText,
               }}
             >
               <div className="flex justify-between mb-4">
-                <span className="font-medium ">Total</span>
-                <span className="font-bold ">{cartTotal} AED</span>
+                <span className="font-medium">Total</span>
+                <span className="font-bold">{cartTotal} AED</span>
               </div>
               <button
                 onClick={handleCheckout}
