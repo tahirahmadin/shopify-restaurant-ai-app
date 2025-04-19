@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle2, MapPin, CreditCard, Coins, ShoppingBag } from "lucide-react";
+import { CheckCircle2, MapPin, CreditCard, Coins } from "lucide-react";
 import { Message, QueryType } from "../../types";
 import { useChatContext } from "../../context/ChatContext";
 import { useFiltersContext } from "../../context/FiltersContext";
@@ -10,7 +10,7 @@ interface OrderMessageProps {
 }
 
 export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
-  const { dispatch, state } = useChatContext();
+  const { dispatch } = useChatContext();
   const { state: restaurantState } = useRestaurant();
   const { theme } = useFiltersContext();
 
@@ -43,84 +43,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
       },
     });
   };
-
-  // Direct implementation of proceed to cart with debugging
-  const handleProceedToCart = () => {
-    console.log("Proceed to Cart clicked");
-    console.log("Current state:", state);
-    
-    try {
-      // Check for selected variant in state
-      if (state.selectedVariantItem) {
-        console.log("Found selected variant:", state.selectedVariantItem);
-        
-        // Add directly to cart with debug info
-        const cartItem = {
-          id: state.selectedVariantItem.id,
-          name: state.selectedVariantItem.name,
-          price: state.selectedVariantItem.price,
-          image: state.selectedVariantItem.image || "",
-          quantity: 1,
-          parentItem: state.selectedVariantItem.parentItem
-        };
-        
-        console.log("Adding to cart:", cartItem);
-        
-        // Direct add to cart
-        dispatch({
-          type: "ADD_TO_CART",
-          payload: cartItem
-        });
-        
-        // Show feedback
-        alert(`Added ${cartItem.name} to cart`);
-        
-        // Clear selected variant
-        dispatch({
-          type: "SET_SELECTED_VARIANT_ITEM",
-          payload: null
-        });
-      } else {
-        console.log("No selected variant found in state");
-        
-        // If no selected variant, create a default item
-        // This is only for testing - you might want to remove this in production
-        const defaultItem = {
-          id: 99999,
-          name: "Test Item (Added via OrderMessage)",
-          price: "10.00",
-          image: "https://via.placeholder.com/400",
-          quantity: 1
-        };
-        
-        console.log("Adding default test item:", defaultItem);
-        
-        // Add test item
-        dispatch({
-          type: "ADD_TO_CART",
-          payload: defaultItem
-        });
-        
-        alert("Added test item to cart (no variant was selected)");
-      }
-      
-      // Try to expand the cart
-      dispatch({
-        type: "SET_CART_EXPANDED",
-        payload: true
-      });
-      
-      // Call parent window if in iframe
-      if (typeof window !== "undefined" && window.parent) {
-        console.log("Sending OPEN_CART message to parent window");
-        window.parent.postMessage({ action: "OPEN_CART" }, "*");
-      }
-    } catch (error) {
-      console.error("Error in handleProceedToCart:", error);
-      alert("Error adding to cart: " + (error instanceof Error ? error.message : String(error)));
-    }
-  };
-
+  
   try {
     const parsedContent = JSON.parse(message.text);
     if (parsedContent.orderSummary) {
@@ -132,7 +55,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
         >
           <div className="flex justify-between items-center">
             <h3 className="font-semibold ">Order Summary</h3>
-            {/* <span className="text-sm">{restaurant}</span> */}
+            <span className="text-sm">{restaurant}</span>
           </div>
 
           <div className="space-y-2">
@@ -146,7 +69,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
                   <span className="opacity-90 text-xs">{item.name}</span>
                 </div>
                 <span className="opacity-80 text-xs">
-                  {(parseFloat(item.price) * item.quantity).toFixed(2)} AED
+                  {(parseFloat(item.price) * item.quantity).toFixed(2)} USD
                 </span>
               </div>
             ))}
@@ -155,7 +78,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
           <div className="border-t pt-3 mt-3">
             <div className="flex justify-between items-center">
               <span className="font-medium ">Total Amount</span>
-              <span className="font-bold ">{total} AED</span>
+              <span className="font-bold ">{total} USD</span>
             </div>
           </div>
 
@@ -190,29 +113,19 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
               )}
               {restaurantState.cashMode && (
                 <button
-                  onClick={handleProceedToCart}
+                  onClick={() => {
+                    window.parent.postMessage({ action: "OPEN_CART" }, "*");
+                  }}
                   style={{
                     backgroundColor: theme.chatBubbleBg,
                     color: theme.chatBubbleText,
                   }}
                   className="flex-1 py-2 px-4 bg-primary text-white rounded-lg text-sm hover:bg-primary-600 transition-colors flex items-center justify-center gap-2"
                 >
-                  <ShoppingBag className="w-4 h-4" />
+                  <Coins className="w-4 h-4" />
                   Proceed to Cart
                 </button>
               )}
-            </div>
-            
-            {/* Debug info - remove in production */}
-            <div className="mt-4 p-2 bg-gray-100 rounded text-xs text-gray-600">
-              <p>Debug - Selected Variant: {state.selectedVariantItem ? state.selectedVariantItem.name : "None"}</p>
-              <p>Debug - Cart Items: {state.cart.length}</p>
-              <button 
-                onClick={() => console.log("State:", state)} 
-                className="text-xs underline mt-1"
-              >
-                Log State
-              </button>
             </div>
           </div>
         </div>
@@ -259,7 +172,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
                       {item.quantity}x {item.name}
                     </span>
                     <span className="opacity-90 font-medium">
-                      {(parseFloat(item.price) * item.quantity).toFixed(2)} AED
+                      {(parseFloat(item.price) * item.quantity).toFixed(2)} USD
                     </span>
                   </div>
                 ))}
@@ -270,7 +183,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
                 <div className="flex justify-between items-center">
                   <span className="text-sm opacity-80">Total Amount</span>
                   <span className="text-lg font-bold ">
-                    {orderDetails.total} AED
+                    {orderDetails.total} USD
                   </span>
                 </div>
                 <div className="flex justify-between items-center mt-1">

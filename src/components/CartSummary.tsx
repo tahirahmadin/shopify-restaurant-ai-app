@@ -128,7 +128,7 @@ export const CartSummary: React.FC = () => {
           }}
         >
           <ShoppingBag className="w-4 h-4" />
-          <span className="font-medium text-xs">{cartTotal} USD</span>
+          <span className="font-medium text-xs">{cartTotal} AED</span>
           <span
             className="px-2 py-0.5 rounded-full text-xs"
             style={{
@@ -165,7 +165,6 @@ export const CartSummary: React.FC = () => {
               {state.cart.map((item) => {
                 // Check if this is a variant item by looking for parentItem property
                 const isVariant = item.parentItem !== undefined;
-                
                 return (
                   <div
                     key={item.id}
@@ -196,7 +195,7 @@ export const CartSummary: React.FC = () => {
                                 "Selected option"}
                             </div>
                           )}
-                          
+
                           {/* Display customizations if they exist */}
                           {item.customizations?.map((customization, index) => (
                             <div
@@ -214,12 +213,11 @@ export const CartSummary: React.FC = () => {
                                     color: theme.modalMainText,
                                   }}
                                 >
-                                  (+{customization.selection.price} USD)
+                                  (+{customization.selection.price} AED)
                                 </span>
                               )}
                             </div>
                           ))}
-                          
                           {/* Render the Edit button if customizations exist */}
                           {item.customizations &&
                             item.customizations.length > 0 && (
@@ -247,7 +245,7 @@ export const CartSummary: React.FC = () => {
                           color: theme.modalMainText,
                         }}
                       >
-                        {item.price} USD
+                        {item.price} AED
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -309,7 +307,7 @@ export const CartSummary: React.FC = () => {
             >
               <div className="flex justify-between mb-4">
                 <span className="font-medium">Total</span>
-                <span className="font-bold">{cartTotal} USD</span>
+                <span className="font-bold">{cartTotal} AED</span>
               </div>
               <button
                 onClick={handleCheckout}
@@ -328,4 +326,3 @@ export const CartSummary: React.FC = () => {
       </div>
     </div>
   );
-};
