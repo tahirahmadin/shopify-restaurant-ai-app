@@ -33,7 +33,7 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
   const { theme } = useFiltersContext();
   const { state: restaurantState } = useRestaurant();
   // Direct access to chat context to add to cart
-  const { dispatch } = useChatContext();
+  const { dispatch, state } = useChatContext();
   const [selectedVariant, setSelectedVariant] = useState<{
     id: number;
     name: string;
@@ -54,74 +54,57 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
     description?: string;
   }) => {
     setSelectedVariant(variant);
-    console.log("Selected variant:", variant); // Debug log
+    console.log("Selected variant:", variant);
   };
 
   const handleAddToCart = () => {
     if (selectedVariant) {
-      // FIXED: Use the actual variant ID instead of constructing a combined ID
-      // This ensures we're using the real Shopify variant ID
       const variantId = selectedVariant.id;
       
       // Format the name to include both the item and variant
       const variantName = `${item.name} - ${selectedVariant.title || selectedVariant.name}`;
       
-      // Debug logs
-      console.log("Adding to cart:", {
-        id: variantId,
-        name: variantName,
-        price: selectedVariant.price,
-        image: selectedVariant.image || item.image,
-        parentItem: {
-          id: item.id,
-          name: item.name
-        }
-      });
+      // Check if this variant is already in cart
+      const existingItem = state.cart.find(cartItem => cartItem.id === variantId);
       
-      // Directly add to cart
-      dispatch({
-        type: "ADD_TO_CART",
-        payload: {
-          id: variantId,
-          name: variantName,
-          price: selectedVariant.price,
-          image: selectedVariant.image || item.image || "https://via.placeholder.com/400",
-          quantity: 1,
-          parentItem: {
-            id: item.id,
-            name: item.name
+      if (existingItem) {
+        // If already in cart, just update the quantity
+        dispatch({
+          type: "UPDATE_CART_ITEM",
+          payload: {
+            ...existingItem,
+            quantity: existingItem.quantity + 1
           }
-        }
-      });
+        });
+      } else {
+        // If not in cart, add it
+        dispatch({
+          type: "ADD_TO_CART",
+          payload: {
+            id: variantId,
+            name: variantName,
+            price: selectedVariant.price,
+            image: selectedVariant.image || item.image || "https://via.placeholder.com/400",
+            quantity: 1,
+            parentItem: {
+              id: item.id,
+              name: item.name
+            }
+          }
+        });
+      }
 
       // Send message to Shopify with the variant ID
       window.parent.postMessage(
         {
           type: "ADD_TO_CART",
           payload: {
-            id: variantId, // Now using the actual variant ID
+            id: variantId,
             quantity: 1,
           },
         },
         "*"
       );
-      
-      // Also set the selected variant item for reference by other components
-      dispatch({
-        type: "SET_SELECTED_VARIANT_ITEM",
-        payload: {
-          id: variantId,
-          name: variantName,
-          price: selectedVariant.price,
-          image: selectedVariant.image || item.image,
-          title: selectedVariant.title,
-          description: selectedVariant.description,
-          parentItem: {
-            id: item.id,
-            name: item.name
-          }
-        }
-      });
       
       // Call the parent component's handler if provided
       if (onSelectVariant) {

@@ -46,42 +46,15 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
 
   const handleProceedToCart = () => {
     try {
-      // Check if there's a selected variant item in the context
-      if (state.selectedVariantItem) {
-        console.log("Found variant item to add to cart:", state.selectedVariantItem);
-        
-        // IMPORTANT: Only send the message to Shopify, don't add to internal cart again
-        // since it was already added when the variant was selected
-        if (typeof window !== "undefined" && window.parent) {
-          window.parent.postMessage(
-            {
-              type: "ADD_TO_CART", // Match the same format used in VariantDrawer
-              payload: {
-                id: state.selectedVariantItem.id, // Use the actual variant ID
-                quantity: 1,
-              },
-            },
-            "*"
-          );
-        }
-        
-        // Clear the selected variant
-        dispatch({
-          type: "SET_SELECTED_VARIANT_ITEM",
-          payload: null,
-        });
+      if (typeof window !== "undefined" && window.parent) {
+        window.parent.postMessage({ action: "OPEN_CART" }, "*");
       }
       
-      // Set the cart as expanded
+      // Set the cart as expanded in our UI
       dispatch({
         type: "SET_CART_EXPANDED",
         payload: true,
       });
-      
-      // Then send the open cart message
-      if (typeof window !== "undefined" && window.parent) {
-        window.parent.postMessage({ action: "OPEN_CART" }, "*");
-      }
     } catch (error) {
       console.error("Error handling proceed to cart:", error);
     }
