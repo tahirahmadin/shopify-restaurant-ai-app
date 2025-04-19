@@ -65,6 +65,20 @@ interface CustomizationModalState {
   isEditing: boolean;
 }
 
+export interface VariantItem {
+  id: number;
+  name: string;
+  price: string;
+  image?: string;
+  title?: string;
+  description?: string;
+  quantity?: number;
+  parentItem?: {
+    id: number;
+    name: string;
+  };
+}
+
 interface ChatState {
   messages: Message[];
   isLoading: boolean;
@@ -102,6 +116,8 @@ interface ChatState {
       }>;
     } | null;
   };
+  selectedVariantItem: VariantItem | null;
+  isCartExpanded: boolean;
 }
 
 export interface CartItem {
@@ -110,6 +126,17 @@ export interface CartItem {
   price: string;
   quantity: number;
   image: string;
+  parentItem?: {
+    id: number;
+    name: string;
+  };
+  customizations?: Array<{
+    categoryName: string;
+    selection: {
+      name: string;
+      price: number;
+    };
+  }>;
 }
 
 type ChatAction =
@@ -145,7 +172,9 @@ type ChatAction =
   | {
       type: "OPEN_CUSTOMIZATION_MODAL";
       payload: { item: any; isEditing: boolean };
-    };
+    }
+  | { type: "SET_SELECTED_VARIANT_ITEM"; payload: VariantItem | null }
+  | { type: "SET_CART_EXPANDED"; payload: boolean };
 
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
@@ -214,7 +243,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       }
       return {
         ...state,
-        cart: [...state.cart, { ...action.payload, quantity: 1 }],
+        cart: [...state.cart, { ...action.payload, quantity: action.payload.quantity || 1 }],
       };
     case "REMOVE_FROM_CART":
       return {
@@ -283,6 +312,16 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
           isEditing: action.payload.isEditing,
         },
       };
+    case "SET_SELECTED_VARIANT_ITEM":
+      return {
+        ...state,
+        selectedVariantItem: action.payload,
+      };
+    case "SET_CART_EXPANDED":
+      return {
+        ...state,
+        isCartExpanded: action.payload,
+      };
     default:
       return state;
   }
@@ -318,6 +357,8 @@ const initialState: ChatState = {
     isOpen: false,
     item: null,
   },
+  selectedVariantItem: null,
+  isCartExpanded: false,
 };
 
 const ChatContext = createContext<{

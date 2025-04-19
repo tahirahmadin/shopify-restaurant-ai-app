@@ -10,7 +10,7 @@ interface OrderMessageProps {
 }
 
 export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
-  const { dispatch } = useChatContext();
+  const { dispatch, state } = useChatContext();
   const { state: restaurantState } = useRestaurant();
   const { theme } = useFiltersContext();
 
@@ -44,6 +44,54 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
     });
   };
 
+  const handleProceedToCart = () => {
+    try {
+      if (state.selectedVariantItem) {
+        const existingItem = state.cart.find(
+          (item) => item.id === state.selectedVariantItem?.id
+        );
+
+        if (existingItem) {
+          dispatch({
+            type: "UPDATE_CART_ITEM",
+            payload: {
+              ...existingItem,
+              quantity: existingItem.quantity + 1,
+            },
+          });
+        } else {
+          dispatch({
+            type: "ADD_TO_CART",
+            payload: {
+              id: state.selectedVariantItem.id,
+              name: state.selectedVariantItem.name,
+              price: state.selectedVariantItem.price,
+              image: state.selectedVariantItem.image || "",
+              quantity: 1,
+              parentItem: state.selectedVariantItem.parentItem,
+            },
+          });
+        }
+
+        dispatch({
+          type: "SET_SELECTED_VARIANT_ITEM",
+          payload: null,
+        });
+      }
+
+      dispatch({
+        type: "SET_CART_EXPANDED",
+        payload: true,
+      });
+
+      if (typeof window !== "undefined" && window.parent) {
+        window.parent.postMessage({ action: "OPEN_CART" }, "*");
+      }
+    } catch (error) {
+      console.error("Error handling proceed to cart:", error);
+    }
+  };
+
   try {
     const parsedContent = JSON.parse(message.text);
     if (parsedContent.orderSummary) {
@@ -55,7 +103,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
         >
           <div className="flex justify-between items-center">
             <h3 className="font-semibold ">Order Summary</h3>
-            <span className="text-sm">{restaurant}</span>
+            {/* <span className="text-sm">{restaurant}</span> */}
           </div>
 
           <div className="space-y-2">
@@ -113,9 +161,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
               )}
               {restaurantState.cashMode && (
                 <button
-                  onClick={() => {
-                    window.parent.postMessage({ action: "OPEN_CART" }, "*");
-                  }}
+                  onClick={handleProceedToCart}
                   style={{
                     backgroundColor: theme.chatBubbleBg,
                     color: theme.chatBubbleText,
