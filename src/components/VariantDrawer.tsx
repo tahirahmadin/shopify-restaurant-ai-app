@@ -135,9 +135,6 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
         });
       }
       
-      // Show a success message or notification
-      alert(`Added ${variantName} to cart`);
-      
       onClose();
     }
   };

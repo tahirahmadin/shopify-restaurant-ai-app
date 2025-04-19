@@ -48,40 +48,11 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
     try {
       // Check if there's a selected variant item in the context
       if (state.selectedVariantItem) {
-        console.log("Found variant item to add to cart:", state.selectedVariantItem);
-        
-        // First add to our internal cart
-        const existingItem = state.cart.find(
-          (item) => item.id === state.selectedVariantItem?.id
-        );
-
-        if (existingItem) {
-          dispatch({
-            type: "UPDATE_CART_ITEM",
-            payload: {
-              ...existingItem,
-              quantity: existingItem.quantity + 1,
-            },
-          });
-        } else {
-          dispatch({
-            type: "ADD_TO_CART",
-            payload: {
-              id: state.selectedVariantItem.id,
-              name: state.selectedVariantItem.name,
-              price: state.selectedVariantItem.price,
-              image: state.selectedVariantItem.image || "",
-              quantity: 1,
-              parentItem: state.selectedVariantItem.parentItem,
-            },
-          });
-        }
-        
-        // Send the variant to Shopify using the same message format as VariantDrawer
+        // ONLY send to Shopify, don't add to internal cart again
         if (typeof window !== "undefined" && window.parent) {
           window.parent.postMessage(
             {
-              type: "ADD_TO_CART",
+              type: "ADD_TO_CART", 
               payload: {
                 id: state.selectedVariantItem.id,
                 quantity: 1,
@@ -91,18 +62,12 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
           );
         }
         
-        // Clear the selected variant
+        // Clear the selected variant to avoid duplicate additions
         dispatch({
           type: "SET_SELECTED_VARIANT_ITEM",
           payload: null,
         });
       }
-      
-      // Set the cart as expanded
-      dispatch({
-        type: "SET_CART_EXPANDED",
-        payload: true,
-      });
       
       // Then send the open cart message
       if (typeof window !== "undefined" && window.parent) {
