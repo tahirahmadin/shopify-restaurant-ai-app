@@ -59,8 +59,9 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
 
   const handleAddToCart = () => {
     if (selectedVariant) {
-      // Create a unique ID for the variant
-      const variantId = parseInt(`${item.id}${selectedVariant.id}`);
+      // FIXED: Use the actual variant ID instead of constructing a combined ID
+      // This ensures we're using the real Shopify variant ID
+      const variantId = selectedVariant.id;
       
       // Format the name to include both the item and variant
       const variantName = `${item.name} - ${selectedVariant.title || selectedVariant.name}`;
@@ -93,11 +94,12 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
         }
       });
 
+      // Send message to Shopify with the variant ID
       window.parent.postMessage(
         {
           type: "ADD_TO_CART",
           payload: {
-            id: variantId,
+            id: variantId, // Now using the actual variant ID
             quantity: 1,
           },
         },

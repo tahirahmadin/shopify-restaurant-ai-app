@@ -48,13 +48,16 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
     try {
       // Check if there's a selected variant item in the context
       if (state.selectedVariantItem) {
-        // ONLY send to Shopify, don't add to internal cart again
+        console.log("Found variant item to add to cart:", state.selectedVariantItem);
+        
+        // IMPORTANT: Only send the message to Shopify, don't add to internal cart again
+        // since it was already added when the variant was selected
         if (typeof window !== "undefined" && window.parent) {
           window.parent.postMessage(
             {
-              type: "ADD_TO_CART", 
+              type: "ADD_TO_CART", // Match the same format used in VariantDrawer
               payload: {
-                id: state.selectedVariantItem.id,
+                id: state.selectedVariantItem.id, // Use the actual variant ID
                 quantity: 1,
               },
             },
@@ -62,12 +65,18 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
           );
         }
         
-        // Clear the selected variant to avoid duplicate additions
+        // Clear the selected variant
         dispatch({
           type: "SET_SELECTED_VARIANT_ITEM",
           payload: null,
         });
       }
+      
+      // Set the cart as expanded
+      dispatch({
+        type: "SET_CART_EXPANDED",
+        payload: true,
+      });
       
       // Then send the open cart message
       if (typeof window !== "undefined" && window.parent) {
@@ -103,7 +112,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
                   <span className="opacity-90 text-xs">{item.name}</span>
                 </div>
                 <span className="opacity-80 text-xs">
-                  {(parseFloat(item.price) * item.quantity).toFixed(2)} USD
+                  {(parseFloat(item.price) * item.quantity).toFixed(2)} AED
                 </span>
               </div>
             ))}
@@ -112,7 +121,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
           <div className="border-t pt-3 mt-3">
             <div className="flex justify-between items-center">
               <span className="font-medium ">Total Amount</span>
-              <span className="font-bold ">{total} USD</span>
+              <span className="font-bold ">{total} AED</span>
             </div>
           </div>
 
@@ -204,7 +213,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
                       {item.quantity}x {item.name}
                     </span>
                     <span className="opacity-90 font-medium">
-                      {(parseFloat(item.price) * item.quantity).toFixed(2)} USD
+                      {(parseFloat(item.price) * item.quantity).toFixed(2)} AED
                     </span>
                   </div>
                 ))}
@@ -215,7 +224,7 @@ export const OrderMessage: React.FC<OrderMessageProps> = ({ message }) => {
                 <div className="flex justify-between items-center">
                   <span className="text-sm opacity-80">Total Amount</span>
                   <span className="text-lg font-bold ">
-                    {orderDetails.total} USD
+                    {orderDetails.total} AED
                   </span>
                 </div>
                 <div className="flex justify-between items-center mt-1">
