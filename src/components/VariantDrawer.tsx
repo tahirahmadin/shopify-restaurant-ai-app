@@ -32,7 +32,8 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
 }) => {
   const { theme } = useFiltersContext();
   const { state: restaurantState } = useRestaurant();
-  const { dispatch } = useChatContext();
+  // Direct access to chat context to add to cart
+  const { dispatch, state } = useChatContext();
   const [selectedVariant, setSelectedVariant] = useState<{
     id: number;
     name: string;
@@ -57,64 +58,25 @@ export const VariantDrawer: React.FC<VariantDrawerProps> = ({
   };
 
   const handleAddToCart = () => {
-    if (selectedVariant) {
-      const variantId = selectedVariant.id;
-      
-      // Format the name to include both the item and variant
-      const variantName = `${item.name} - ${selectedVariant.title || selectedVariant.name}`;
-      
-      console.log("Adding to internal cart only:", {
-        id: variantId,
-        name: variantName,
-        price: selectedVariant.price
-      });
-      
-      dispatch({
-        type: "ADD_TO_CART",
-        payload: {
-          id: variantId,
-          name: variantName,
-          price: selectedVariant.price,
-          image: selectedVariant.image || item.image || "https://via.placeholder.com/400",
-          quantity: 1,
-          parentItem: {
-            id: item.id,
-            name: item.name
-          }
-        }
-      });
-      
-      dispatch({
-        type: "SET_SELECTED_VARIANT_ITEM",
-        payload: {
-          id: variantId,
-          name: variantName,
-          price: selectedVariant.price,
-          image: selectedVariant.image || item.image,
-          title: selectedVariant.title,
-          description: selectedVariant.description,
-          parentItem: {
-            id: item.id,
-            name: item.name
-          }
-        }
-      });
-      
-      if (onSelectVariant) {
-        onSelectVariant({
-          id: variantId,
-          name: variantName,
-          price: selectedVariant.price,
-          image: selectedVariant.image || item.image,
-          parentItem: {
-            id: item.id,
-            name: item.name
-          }
-        });
-      }
-      
-      onClose();
-    }
+    if (!selectedVariant) return;
+    const variantId = selectedVariant.id;
+    const variantName = `${item.name} - ${selectedVariant.title || selectedVariant.name}`;
+
+    onSelectVariant?.({
+      id: variantId,
+      name: variantName,
+      price: selectedVariant.price,
+      image: selectedVariant.image || item.image,
+      quantity: 1,
+      parentItem: { id: item.id, name: item.name }
+    });
+
+    window.parent.postMessage(
+      { type: "ADD_TO_CART", payload: { id: variantId, quantity: 1 } },
+      "*"
+    );
+  
+    onClose();
   };
 
   return (
